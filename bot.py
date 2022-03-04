@@ -3,7 +3,9 @@ import random
 import discord
 import json
 from dotenv import load_dotenv
-
+intents = discord.Intents.default()
+intents.members = True
+intents.presences = True
 
 load_dotenv()
 
@@ -13,8 +15,6 @@ jays_id = 322098392161452033
 seans_id = 310226357273493504
 COMMAND_CHARACTER = ["!","#"]
 count = 1
-
-
 
 async def command_99(message):
     """
@@ -67,7 +67,7 @@ brooklyn_99_quotes = [
             'no doubt no doubt no doubt no doubt.'
         ),
     ]
-client = discord.Client()
+client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
@@ -81,11 +81,16 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    await member.create_dm()
-    await member.dm_channel.send(
-        f"Hi {member.name}, welcome to my Discord server!"
-    )
-    print("it worked!")
+    print("someone joined!")
+    # await member.create_dm()
+    # await member.dm_channel.send(
+    #     f"Hi {member.name}, welcome to my Discord server!"
+    # )
+    this_guild = member.guild
+    print(this_guild.id)
+    channel = this_guild.text_channels[0]
+    print(channel)
+    await channel.send(f"Hi {member.name}, welcome to my Discord server!")
 
 @client.event
 async def on_message(message):
