@@ -12,11 +12,14 @@ GUILD = os.getenv('DISCORD_GUILD')
 jays_id = 322098392161452033
 seans_id = 310226357273493504
 COMMAND_CHARACTER = ["!","#"]
-count = 0
+count = 1
 
 
 
 async def command_99(message):
+    """
+    Makes me tell you a random Brooklynn 99 quote
+    """
     if message.author.id ==  jays_id:
         await message.channel.send("lul nope")
         return
@@ -24,11 +27,17 @@ async def command_99(message):
     await message.channel.send(response)
 
 async def command_count(message):
+    """
+    Returns the amount of times this command has been used since last bot reset
+    """
     global count
     await message.channel.send(f'{count}')
     count += 1
 
 async def command_encourage(message):
+    """
+    responds with a word of encouragement
+    """
     with open("Data/encouragement.json") as f:
         encouragement = json.load(f)
     if message.author.id == seans_id:
@@ -36,13 +45,19 @@ async def command_encourage(message):
     response = random.choice(encouragement)
     await message.channel.send(response)
 
+async def command_help(message):
+    newline = "\n"
+    output = f'Available commands:{newline} !{f"{newline} !".join(list(command_map))}'
+    await message.channel.send(output)
+
 async def command_unknown(message):
     await message.channel.send("sorry unknown command")
 
 command_map = {
     '99':command_99,
     'count':command_count,
-    'encourage':command_encourage
+    'encourage':command_encourage,
+    'help':command_help
 }
 brooklyn_99_quotes = [
         'I\'m the human form of the 💯 emoji.',
@@ -83,12 +98,5 @@ async def on_message(message):
         raise discord.DiscordException
 
 
-
-# class CustomClient(discord.Client):
-#     async def on_ready(self):
-#         print(f'{self.user} has connected to discord!')
-    
-
-# client = CustomClient()    
 client.run(TOKEN)
 
