@@ -15,7 +15,8 @@ GUILD = os.getenv('DISCORD_GUILD')
 jays_id = 322098392161452033
 seans_id = 310226357273493504
 count = 1
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='!',intents=intents)
+
 
 @bot.command(name='99')
 async def command_99(ctx):
@@ -64,12 +65,13 @@ async def on_ready():
         f'{bot.user.name} has connect to Discord:\n'
 
         )
-#need to fix this
-# @client.event
-# async def on_member_join(member):
-#     this_guild = member.guild
-#     channel = this_guild.text_channels[0]
-#     await channel.send(f"Hi {member.name}, welcome to my Discord server!")
+
+@bot.listen()
+async def on_member_join(member):
+    this_guild = member.guild
+    channel = this_guild.text_channels[0]
+    await channel.send(f"Hi {member.name}, welcome to my Discord server!")
+
 
 bot.run(TOKEN)
 
