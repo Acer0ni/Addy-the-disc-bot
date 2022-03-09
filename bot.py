@@ -2,6 +2,7 @@ import os
 import random
 import discord
 import json
+import requests
 from dotenv import load_dotenv
 from discord.ext import commands
 intents = discord.Intents.default()
@@ -9,7 +10,7 @@ intents.members = True
 intents.presences = True
 
 load_dotenv()
-
+skill = ['Overall','Attack', 'Defence', 'Strength', 'Constitution', 'Ranged', 'Prayer', 'Magic', 'Cooking', 'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore', 'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction', 'Summoning', 'Dungeoneering', 'Divination', 'Invention', 'Archaeology']
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 jays_id = 322098392161452033
@@ -17,6 +18,14 @@ seans_id = 310226357273493504
 count = 1
 bot = commands.Bot(command_prefix='!',intents=intents)
 
+#deal with multi word names
+@bot.command(name='hs')
+async def command_HS(ctx,*args):
+    username = '{}'.format(' '.join(args))
+    response = requests.get(f"https://secure.runescape.com/m=hiscore/index_lite.ws?player={username}")
+    formated_response =highscores_formatter(response.content)
+    for x in range(29):
+        await ctx.send(f"{skill[x]} level: {formated_response[x][1].decode('utf-8')} experience: {formated_response[x][2].decode('utf-8')} Rank: {formated_response[x][0].decode('utf-8')} ")
 
 @bot.command(name='99')
 async def command_99(ctx):
@@ -25,6 +34,7 @@ async def command_99(ctx):
     """
     if ctx.author.id ==  jays_id:
         await ctx.send("lul nope")
+
         return
     response = random.choice(brooklyn_99_quotes)
     await ctx.send(response)
@@ -47,6 +57,7 @@ async def command_encourage(ctx):
         encouragement = json.load(f)
     if ctx.author.id == seans_id:
         await ctx.send("sorry, nothing nice to say about Canadians")
+        return
     response = random.choice(encouragement)
     await ctx.send(response)
 
@@ -72,6 +83,13 @@ async def on_member_join(member):
     channel = this_guild.text_channels[0]
     await channel.send(f"Hi {member.name}, welcome to my Discord server!")
 
+def highscores_formatter(data):
+    f_data = data.split()
+    more_f_data =[] 
+    for unit in f_data:
+        x = unit.split(b',')
+        more_f_data.append(x)
+    return more_f_data
 
 bot.run(TOKEN)
 
