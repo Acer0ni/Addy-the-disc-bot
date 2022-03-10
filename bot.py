@@ -21,6 +21,9 @@ bot = commands.Bot(command_prefix='!',intents=intents)
 #deal with multi word names
 @bot.command(name='hs')
 async def command_HS(ctx,*args):
+    """
+    use this command to look up a player in RS3
+    """
     username = '{}'.format(' '.join(args))
     response = requests.get(f"https://secure.runescape.com/m=hiscore/index_lite.ws?player={username}")
     print(response.status_code)
@@ -31,8 +34,13 @@ async def command_HS(ctx,*args):
         await ctx.send("sorry something went wrong, please try again")
         return
     formated_response =highscores_formatter(response.content)
-    for x in range(29):
-        await ctx.send(f"{skill[x]} level: {formated_response[x][1].decode('utf-8')} experience: {formated_response[x][2].decode('utf-8')} Rank: {formated_response[x][0].decode('utf-8')} ")
+    new_line= '\n'
+    new_string = "".join(
+        f"{skill[x]} level: {formated_response[x][1].decode('utf-8')} experience: {formated_response[x][2].decode('utf-8')} Rank: {formated_response[x][0].decode('utf-8')} {new_line}"
+        for x in range(29)
+    )
+
+    await ctx.send(new_string)
 
 @bot.command(name='99')
 async def command_99(ctx):
