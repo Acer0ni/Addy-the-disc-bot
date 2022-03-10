@@ -23,6 +23,13 @@ bot = commands.Bot(command_prefix='!',intents=intents)
 async def command_HS(ctx,*args):
     username = '{}'.format(' '.join(args))
     response = requests.get(f"https://secure.runescape.com/m=hiscore/index_lite.ws?player={username}")
+    print(response.status_code)
+    if response.status_code == 404:
+        await ctx.send("sorry that player is not featured on the Highscores")
+        return
+    elif response.status_code != 200:
+        await ctx.send("sorry something went wrong, please try again")
+        return
     formated_response =highscores_formatter(response.content)
     for x in range(29):
         await ctx.send(f"{skill[x]} level: {formated_response[x][1].decode('utf-8')} experience: {formated_response[x][2].decode('utf-8')} Rank: {formated_response[x][0].decode('utf-8')} ")
