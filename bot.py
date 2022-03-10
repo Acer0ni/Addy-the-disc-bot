@@ -1,3 +1,4 @@
+from cmath import exp
 import os
 import random
 import discord
@@ -26,7 +27,6 @@ async def command_HS(ctx,*args):
     """
     username = '{}'.format(' '.join(args))
     response = requests.get(f"https://secure.runescape.com/m=hiscore/index_lite.ws?player={username}")
-    print(response.status_code)
     if response.status_code == 404:
         await ctx.send("sorry that player is not featured on the Highscores")
         return
@@ -35,11 +35,11 @@ async def command_HS(ctx,*args):
         return
     formated_response =highscores_formatter(response.content)
     new_line= '\n'
-    new_string = "".join(
-        f"{skill[x]} level: {formated_response[x][1].decode('utf-8')} experience: {formated_response[x][2].decode('utf-8')} Rank: {formated_response[x][0].decode('utf-8')} {new_line}"
-        for x in range(29)
-    )
-
+    new_string = ""
+    for x in range(29):
+        exp=int(formated_response[x][2])
+        rank=int(formated_response[x][0])
+        new_string += f"{skill[x]} level: {formated_response[x][1]} experience: {exp:,} Rank: {rank:,} {new_line}"
     await ctx.send(new_string)
 
 @bot.command(name='99')
@@ -102,7 +102,7 @@ def highscores_formatter(data):
     f_data = data.split()
     more_f_data =[] 
     for unit in f_data:
-        x = unit.split(b',')
+        x = unit.decode('utf-8').split(',')
         more_f_data.append(x)
     return more_f_data
 
