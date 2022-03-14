@@ -2,6 +2,7 @@ from cmath import exp
 import os
 import random
 from unicodedata import category
+from urllib import response
 import discord
 import json
 import requests
@@ -10,18 +11,26 @@ from discord.ext import commands
 intents = discord.Intents.default()
 intents.members = True
 intents.presences = True
-
 load_dotenv()
 skill = ['Overall','Attack', 'Defence', 'Strength', 'Constitution', 'Ranged', 'Prayer', 'Magic', 'Cooking', 'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore', 'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction', 'Summoning', 'Dungeoneering', 'Divination', 'Invention', 'Archaeology']
 activities = ['Bounty Hunter','B.H. Rogues','Dominion Tower','The Crucible','Castle Wars games', 'B.A. Attackers', 'B.A. Defenders', 'B.A. Collectors','B.A. Healers', 'Duel Tournament','Mobilising Armies','Conquest','Fist of Guthix','GG: Athletics','GG: Resource Race','WE2: Armadyl Lifetime Contribution','WE2: Bandos Lifetime Contribution','WE2: Armadyl PvP kills','WE2: Bandos PvP kills','Heist Guard Level','Heist Robber Level','CFP: 5 game average','AF15: Cow Tipping','AF15: Rats killed after the miniquest','RuneScore', 'Clue Scrolls Easy','Clue Scrolls Medium','Clue Scrolls Hard','Clue Scrolls Elite','Clue Scrolls Master']
+brooklyn_99_quotes = [
+        'I\'m the human form of the 💯 emoji.',
+        'Bingpot!',
+        (
+            'Cool. Cool cool cool cool cool cool cool, '
+            'no doubt no doubt no doubt no doubt.'
+        ),
+    ]
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
+W2G_TOKEN = os.getenv('W2G_TOKEN')
 jays_id = 322098392161452033
 seans_id = 310226357273493504
 count = 1
 bot = commands.Bot(command_prefix='!',intents=intents)
 
-#deal with multi word names
+
 @bot.command(name='hs',category ='runescape')
 async def command_HS(ctx,*args):
     """
@@ -85,14 +94,27 @@ async def command_encourage(ctx):
     response = random.choice(encouragement)
     await ctx.send(response)
 
-brooklyn_99_quotes = [
-        'I\'m the human form of the 💯 emoji.',
-        'Bingpot!',
-        (
-            'Cool. Cool cool cool cool cool cool cool, '
-            'no doubt no doubt no doubt no doubt.'
-        ),
-    ]
+@bot.command(name="create")
+async def W2G_create_room(ctx,args):
+    """creates a room at watch2gether.tv to watch videos with your friend"""
+
+    share = args
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+    payload = {
+        "w2g_api_key": W2G_TOKEN,
+        "share": share,
+        "bg_color": "#00ff00",
+        "bg_opacity": "50"
+    }
+    response = requests.post("https://w2g.tv/rooms/create.json",headers = headers,data=json.dumps(payload))
+    content = json.loads(response.content)
+   
+    await ctx.send(f"Here is your room! https://w2g.tv/rooms/{content['streamkey']}")
+    await ctx.send(f"Please save your room id for future use: {content['streamkey']}")
+
 
 @bot.event
 async def on_ready():
