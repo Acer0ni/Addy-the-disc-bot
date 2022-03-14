@@ -111,10 +111,24 @@ async def W2G_create_room(ctx,args):
     }
     response = requests.post("https://w2g.tv/rooms/create.json",headers = headers,data=json.dumps(payload))
     content = json.loads(response.content)
-   
     await ctx.send(f"Here is your room! https://w2g.tv/rooms/{content['streamkey']}")
     await ctx.send(f"Please save your room id for future use: {content['streamkey']}")
 
+@bot.command(name='play')
+async def W2g_Play(ctx,*args):
+    streamkey = args[0]
+    url = args[1]
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+    payload = {
+        "w2g_api_key": W2G_TOKEN,
+        "item_url" : url
+    }
+    response = requests.post(f"https://w2g.tv/rooms/{streamkey}/sync_update",headers = headers,data=json.dumps(payload))
+    await ctx.send("your video is now playing.")
+    await ctx.send(f"here is your link https://w2g.tv/rooms/{streamkey}")
 
 @bot.event
 async def on_ready():
