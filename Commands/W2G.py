@@ -38,25 +38,28 @@ class Watch2Gether(commands.Cog):
             "bg_opacity": "50"
         }
         response = requests.post("https://w2g.tv/rooms/create.json",headers = headers,data=json.dumps(payload))
-        content = json.loads(response.content)
-        data[author] = content['streamkey']
-        json_string = json.dumps(data)
-        with open('Data/W2G_data.json','w') as outfile:
-            outfile.write(json_string)
-        await ctx.send(f"Here is your room! https://w2g.tv/rooms/{content['streamkey']}")
-        await ctx.send(f"Please save your room id for future use: {content['streamkey']}")
+        if response.status_code == 200:
+            content = json.loads(response.content)
+            data[author] = content['streamkey']
+            json_string = json.dumps(data)
+            with open('Data/W2G_data.json','w') as outfile:
+                outfile.write(json_string)
+            await ctx.send(f"Here is your room! https://w2g.tv/rooms/{content['streamkey']}")
+        else:
+            await ctx.send("something went wrong, please try again")
 
-    #refactor this to not use *args (ctx,id,url)
     @commands.command(name='play')
-    async def W2G_Play(self,ctx,*args):
+    async def W2G_Play(self,ctx,url):
         """
-        plays a video immediately in your chosen room
-        !play {room id} {video url}
+        plays a video immediately in your personal room and will create one for you if you dont have one
+        !play  {video url}
         """
-        streamkey = args[0]
-        url = args[1]
-        if streamkey == "42":
-            streamkey = W2G_ROOM
+        with open('Data/W2G_Data.json') as json_file:
+            data = json.load(json_file)
+        author = str(ctx.message.author)
+        if author not in data:
+            await Watch2Gether.W2G_create_room(self,ctx,url)
+            return
         headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -65,10 +68,10 @@ class Watch2Gether(commands.Cog):
             "w2g_api_key": W2G_TOKEN,
             "item_url" : url
         }
-        response = requests.post(f"https://w2g.tv/rooms/{streamkey}/sync_update",headers = headers,data=json.dumps(payload))
+        response = requests.post(f"https://w2g.tv/rooms/{data[author]}/sync_update",headers = headers,data=json.dumps(payload))
         if response.status_code == 200:
             await ctx.send("your video is now playing.")
-            await ctx.send(f"here is your link https://w2g.tv/rooms/{streamkey}")
+            await ctx.send(f"here is your link https://w2g.tv/rooms/{data[author]}")
         else:
             await ctx.send("something went wrong, please try again.")
 
