@@ -1,5 +1,4 @@
 import os
-import random
 import discord
 import json
 import requests
@@ -12,13 +11,10 @@ intents.presences = True
 load_dotenv()
 skill = ['Overall','Attack', 'Defence', 'Strength', 'Constitution', 'Ranged', 'Prayer', 'Magic', 'Cooking', 'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore', 'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction', 'Summoning', 'Dungeoneering', 'Divination', 'Invention', 'Archaeology']
 activities = ['Bounty Hunter','B.H. Rogues','Dominion Tower','The Crucible','Castle Wars games', 'B.A. Attackers', 'B.A. Defenders', 'B.A. Collectors','B.A. Healers', 'Duel Tournament','Mobilising Armies','Conquest','Fist of Guthix','GG: Athletics','GG: Resource Race','WE2: Armadyl Lifetime Contribution','WE2: Bandos Lifetime Contribution','WE2: Armadyl PvP kills','WE2: Bandos PvP kills','Heist Guard Level','Heist Robber Level','CFP: 5 game average','AF15: Cow Tipping','AF15: Rats killed after the miniquest','RuneScore', 'Clue Scrolls Easy','Clue Scrolls Medium','Clue Scrolls Hard','Clue Scrolls Elite','Clue Scrolls Master']
-
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 W2G_TOKEN = os.getenv('W2G_TOKEN')
 W2G_ROOM = os.getenv('W2G_ROOM')
-
-
 bot = commands.Bot(command_prefix='!',intents=intents)
 
 
@@ -115,12 +111,14 @@ async def W2G_add(ctx,streamkey,url,title):
     response = requests.post(f"https://w2g.tv/rooms/{streamkey}/playlists/current/playlist_items/sync_update",headers = headers,data=json.dumps(payload))
     await ctx.send("your video is now queued")
     await ctx.send(f"here is your link https://w2g.tv/rooms/{streamkey}")
+
 @bot.event
 async def on_ready():
     print(
         f'{bot.user.name} has connect to Discord:\n'
 
         )
+
 def highscores_formatter(data):
     f_data = data.split()
     more_f_data =[] 

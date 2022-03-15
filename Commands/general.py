@@ -2,18 +2,10 @@ from discord.ext import commands
 import discord
 import random
 import json
-
+import requests
 count = 1
 seans_id = 310226357273493504
 jays_id = 322098392161452033
-brooklyn_99_quotes = [
-        'I\'m the human form of the 💯 emoji.',
-        'Bingpot!',
-        (
-            'Cool. Cool cool cool cool cool cool cool, '
-            'no doubt no doubt no doubt no doubt.'
-        ),
-    ]
 class General(commands.Cog):
     """
     A random assortment of commands.
@@ -58,5 +50,6 @@ class General(commands.Cog):
         if ctx.author.id ==  jays_id:
             await ctx.send("lul nope")
             return
-        response = random.choice(brooklyn_99_quotes)
-        await ctx.send(response)
+        response = requests.get('https://brooklyn-nine-nine-quotes.herokuapp.com/api/v1/quotes/random')
+        content = json.loads(response.content)
+        await ctx.send(content['Data']['QuoteText'])
