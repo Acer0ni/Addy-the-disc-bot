@@ -157,9 +157,7 @@ async def W2G_add(ctx,streamkey,url,title):
         "add_items": [{"url": url, "title": title}],
     }
     response = requests.post(f"https://w2g.tv/rooms/{streamkey}/playlists/current/playlist_items/sync_update",headers = headers,data=json.dumps(payload))
-    print(response)
-
-    await ctx.send("your video is now qued")
+    await ctx.send("your video is now queued")
     await ctx.send(f"here is your link https://w2g.tv/rooms/{streamkey}")
 @bot.event
 async def on_ready():
