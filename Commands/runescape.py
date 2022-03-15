@@ -16,7 +16,7 @@ def highscores_formatter(data):
 
 class Runescape(commands.Cog):
     """
-    an assortment of runescape3 functions
+    An assortment of Runescape3 functions.
     """
     def __init__(self, bot):
         self.bot = bot
@@ -27,15 +27,15 @@ class Runescape(commands.Cog):
     @commands.command(name='hs')
     async def command_HS(self,ctx,*args):
         """
-        use this command to look up a player in RS3
+        Use this command to look up a player in RS3.
         """
         username = '{}'.format(' '.join(args))
         response = requests.get(f"https://secure.runescape.com/m=hiscore/index_lite.ws?player={username}")
         if response.status_code == 404:
-            await ctx.send("sorry that player is not featured on the Highscores")
+            await ctx.send("Sorry, that player is not featured on the Highscores.")
             return
         elif response.status_code != 200:
-            await ctx.send("sorry something went wrong, please try again")
+            await ctx.send("Sorry something went wrong, please try again. ")
             return
         formated_response = highscores_formatter(response.content)
         new_line= '\n'

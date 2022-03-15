@@ -1,6 +1,6 @@
 ### Meet Addy
 
-Addy is the digital manifestation of my ADHD… meaning her commands are all over the place right now. I started this project as an exercise to get more familiar with Python, it has become an ongoing source of inspiration and exploration.
+Addy is the digital manifestation of my ADHD… meaning her commands are all over the place right now. I started this project as an exercise to get more familiar with Python, and it has become an ongoing source of inspiration and exploration.
 
 
 ### Commands
@@ -27,18 +27,18 @@ Returns with the stats of the specified player in Runescape 3.
 
 !create {video url}
 
-Creates a room for you and your friends on Watch2Gether with the specified video. It also gives you the room id for future use.
+Creates a room for you and your friends on Watch2Gether with the specified video. 
 
 ### Play
 
-!play {roomid} {video url}
+!play  {video url}
 
-Plays the specified video immediately in the room.
+Plays the specified video immediately in your personal room. If you do not have one, it creates one for you
 
 ### Add
 
-!add {room id} {video url} {title}
+!add  {video url} {title}
 
-Adds the video to the room's queue.
+Adds the video to your room's queue. If you do not have a room, it creates a room for you with the specified video.
 
 

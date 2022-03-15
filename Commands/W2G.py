@@ -19,13 +19,13 @@ class Watch2Gether(commands.Cog):
 
     @commands.command(name="create")
     async def W2G_create_room(self,ctx,args):
-        """creates a room at watch2gether.tv to watch videos with your friend"""
+        """Creates a room at watch2gether.tv to watch videos with your friends."""
         with open('Data/W2G_Data.json') as json_file:
             data = json.load(json_file)
         share = args
         author = str(ctx.message.author)
         if author in data:
-            await ctx.send(f"you already have a room created. your url is https://w2g.tv/rooms/{data[author]} ")
+            await ctx.send(f"You already have a room created. Your url is https://w2g.tv/rooms/{data[author]} ")
             return
         headers = {
             'Accept': 'application/json',
@@ -46,12 +46,12 @@ class Watch2Gether(commands.Cog):
                 outfile.write(json_string)
             await ctx.send(f"Here is your room! https://w2g.tv/rooms/{content['streamkey']}")
         else:
-            await ctx.send("something went wrong, please try again")
+            await ctx.send("Something went wrong, please try again.")
 
     @commands.command(name='play')
     async def W2G_Play(self,ctx,url):
         """
-        plays a video immediately in your personal room and will create one for you if you dont have one
+        Plays a video immediately in your personal room, and will create one for you if you don't have one.
         !play  {video url}
         """
         with open('Data/W2G_Data.json') as json_file:
@@ -70,21 +70,24 @@ class Watch2Gether(commands.Cog):
         }
         response = requests.post(f"https://w2g.tv/rooms/{data[author]}/sync_update",headers = headers,data=json.dumps(payload))
         if response.status_code == 200:
-            await ctx.send("your video is now playing.")
-            await ctx.send(f"here is your link https://w2g.tv/rooms/{data[author]}")
+            await ctx.send("Your video is now playing.")
+            await ctx.send(f"Here is your link! https://w2g.tv/rooms/{data[author]}")
         else:
-            await ctx.send("something went wrong, please try again.")
+            await ctx.send("Something went wrong, please try again.")
 
     #use *args to make titles optional
     @commands.command(name='add')
-    async def W2G_add(self,ctx,streamkey,url,title):
+    async def W2G_add(self,ctx,url,title = "none"):
         """
-        add a video to the que of your chosen room
-        this feature only works on room created by addy at the moment.
-        !add {room id} {video url} {title}
+        Add a video to the queue of your personal room. If you do not have a room,it creates one and plays the video for you.
+        !add {video url} {title}(optional)
         """
-        if streamkey == "42":
-            streamkey = W2G_ROOM
+        with open('Data/W2G_Data.json') as json_file:
+            data = json.load(json_file)
+        author = str(ctx.message.author)
+        if author not in data:
+            await Watch2Gether.W2G_create_room(self,ctx,url)
+            return
         headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -93,10 +96,10 @@ class Watch2Gether(commands.Cog):
             "w2g_api_key": W2G_TOKEN,
             "add_items": [{"url": url, "title": title}],
         }
-        response = requests.post(f"https://w2g.tv/rooms/{streamkey}/playlists/current/playlist_items/sync_update",headers = headers,data=json.dumps(payload))
+        response = requests.post(f"https://w2g.tv/rooms/{data[author]}/playlists/current/playlist_items/sync_update",headers = headers,data=json.dumps(payload))
         if response.status_code == 200:
-            await ctx.send("your video is now queued")
-            await ctx.send(f"here is your link https://w2g.tv/rooms/{streamkey}")
+            await ctx.send("Your video is now queued.")
+            await ctx.send(f"Here is your link! https://w2g.tv/rooms/{data[author]}")
         else:
-            await ctx.send("something went wrong, please try again.")
+            await ctx.send("Something went wrong, please try again.")
 

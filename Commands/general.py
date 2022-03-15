@@ -18,7 +18,7 @@ class General(commands.Cog):
     async def on_member_join(self,member):
         this_guild = member.guild
         channel = this_guild.text_channels[0]
-        await channel.send(f"Hi {member.name}, welcome to my Discord server!")
+        await channel.send(f"Hi {member.name}, Welcome to my Discord server!")
 
     @commands.command(name='count')
     async def command_count(self,ctx):
@@ -37,7 +37,7 @@ class General(commands.Cog):
         with open("Data/encouragement.json") as f:
             encouragement = json.load(f)
         if ctx.author.id == seans_id:
-            await ctx.send("sorry, nothing nice to say about Canadians")
+            await ctx.send("Sorry, nothing nice to say about Canadians.")
             return
         response = random.choice(encouragement)
         await ctx.send(response)
