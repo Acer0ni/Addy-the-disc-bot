@@ -20,8 +20,13 @@ class Watch2Gether(commands.Cog):
     @commands.command(name="create")
     async def W2G_create_room(self,ctx,args):
         """creates a room at watch2gether.tv to watch videos with your friend"""
-
+        with open('Data/W2G_Data.json') as json_file:
+            data = json.load(json_file)
         share = args
+        author = str(ctx.message.author)
+        if author in data:
+            await ctx.send(f"you already have a room created. your url is https://w2g.tv/rooms/{data[author]} ")
+            return
         headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -34,6 +39,10 @@ class Watch2Gether(commands.Cog):
         }
         response = requests.post("https://w2g.tv/rooms/create.json",headers = headers,data=json.dumps(payload))
         content = json.loads(response.content)
+        data[author] = content['streamkey']
+        json_string = json.dumps(data)
+        with open('Data/W2G_data.json','w') as outfile:
+            outfile.write(json_string)
         await ctx.send(f"Here is your room! https://w2g.tv/rooms/{content['streamkey']}")
         await ctx.send(f"Please save your room id for future use: {content['streamkey']}")
 
