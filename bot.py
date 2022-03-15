@@ -25,6 +25,7 @@ brooklyn_99_quotes = [
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 W2G_TOKEN = os.getenv('W2G_TOKEN')
+W2G_ROOM = os.getenv('W2G_ROOM')
 jays_id = 322098392161452033
 seans_id = 310226357273493504
 count = 1
@@ -114,10 +115,17 @@ async def W2G_create_room(ctx,args):
     await ctx.send(f"Here is your room! https://w2g.tv/rooms/{content['streamkey']}")
     await ctx.send(f"Please save your room id for future use: {content['streamkey']}")
 
+#refactor this to not use *args (ctx,id,url)
 @bot.command(name='play')
-async def W2g_Play(ctx,*args):
+async def W2G_Play(ctx,*args):
+    """
+    plays a video immediately in your chosen room
+    !play {room id} {video url}
+    """
     streamkey = args[0]
     url = args[1]
+    if streamkey == "42":
+        streamkey = W2G_ROOM
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -130,6 +138,29 @@ async def W2g_Play(ctx,*args):
     await ctx.send("your video is now playing.")
     await ctx.send(f"here is your link https://w2g.tv/rooms/{streamkey}")
 
+#use *args to make titles optional
+@bot.command(name='add')
+async def W2G_add(ctx,streamkey,url,title):
+    """
+    add a video to the que of your chosen room
+    this feature only works on room created by addy at the moment.
+    !add {room id} {video url} {title}
+    """
+    if streamkey == "42":
+        streamkey = W2G_ROOM
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+    payload = {
+        "w2g_api_key": W2G_TOKEN,
+        "add_items": [{"url": url, "title": title}],
+    }
+    response = requests.post(f"https://w2g.tv/rooms/{streamkey}/playlists/current/playlist_items/sync_update",headers = headers,data=json.dumps(payload))
+    print(response)
+
+    await ctx.send("your video is now qued")
+    await ctx.send(f"here is your link https://w2g.tv/rooms/{streamkey}")
 @bot.event
 async def on_ready():
     print(
