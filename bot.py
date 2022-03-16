@@ -3,7 +3,7 @@ import discord
 import json
 from Commands.general import General
 from Commands.runescape import Runescape
-from Commands.W2g.commands import Watch2Gether
+from Commands.W2G.commands import Watch2Gether
 from dotenv import load_dotenv
 from discord.ext import commands
 

@@ -3,8 +3,7 @@ from dotenv import load_dotenv
 import os
 import requests
 import json
-from Commands.W2g.helper import W2G_helper
-
+from Commands.W2G.http import W2G_helper
 
 load_dotenv()
 # why did this suddenly change from a dict to a sub routine when i moved it
@@ -30,6 +29,7 @@ class Watch2Gether(commands.Cog):
         Creates a room at watch2gether.tv to watch videos with your friends.
         """
         author = str(ctx.message.author)
+
         if author in self.user_data:
             await ctx.send(
                 f"You already have a room created. Your url is https://w2g.tv/rooms/{self.user_data[author]} "
@@ -46,16 +46,16 @@ class Watch2Gether(commands.Cog):
                 outfile.write(json_string)
 
     @commands.command(name="play")
-    async def W2G_Play(self, ctx, url):
+    async def CMD_W2G_Play(self, ctx, url):
         """
         Plays a video immediately in your personal room, and will create one for you if you don't have one.
         !play {video url}
         """
         author = str(ctx.message.author)
         if author not in self.user_data:
-            await Watch2Gether.W2G_create_room(self, ctx, url)
+            await Watch2Gether.CMD_W2G_create_room(self, ctx, url)
             return
-        response = Watch2Gether.W2G_Play(author, url)
+        response = await W2G_helper.W2G_play(self.user_data[author], url)
         if response == 200:
             await ctx.send("Your video is now playing.")
             await ctx.send(
@@ -65,29 +65,21 @@ class Watch2Gether(commands.Cog):
             await ctx.send("Something went wrong, please try again.")
 
     @commands.command(name="add")
-    async def W2G_add(self, ctx, url, title="none"):
+    async def CMD_W2G_add(self, ctx, url, title="none"):
         """
         Add a video to the queue of your personal room. If you do not have a room,it creates one and plays the video for you.
         !add {video url} {title}(optional)
         """
-        with open("Data/W2G_Data.json") as json_file:
-            data = json.load(json_file)
         author = str(ctx.message.author)
-        if author not in data:
-            await Watch2Gether.W2G_create_room(self, ctx, url)
+        if author not in self.user_data:
+            await Watch2Gether.CMD_W2G_create_room(self, ctx, url)
             return
-        headers = {"Accept": "application/json", "Content-Type": "application/json"}
-        payload = {
-            "w2g_api_key": W2G_TOKEN,
-            "add_items": [{"url": url, "title": title}],
-        }
-        response = requests.post(
-            f"https://w2g.tv/rooms/{data[author]}/playlists/current/playlist_items/sync_update",
-            headers=headers,
-            data=json.dumps(payload),
-        )
-        if response.status_code == 200:
+        response = await W2G_helper.W2G_add(self.user_data[author], url, title)
+
+        if response == 200:
             await ctx.send("Your video is now queued.")
-            await ctx.send(f"Here is your link! https://w2g.tv/rooms/{data[author]}")
+            await ctx.send(
+                f"Here is your link! https://w2g.tv/rooms/{self.user_data[author]}"
+            )
         else:
             await ctx.send("Something went wrong, please try again.")

@@ -19,7 +19,7 @@ class W2G_helper:
         payload = {
             "w2g_api_key": W2G_TOKEN,
             "share": video_url,
-            "bg_color": "#00ff00",
+            "bg_color": "#ffffff",
             "bg_opacity": "50",
         }
         response = await W2G_helper.W2G_request(url, json=payload)
@@ -30,7 +30,17 @@ class W2G_helper:
             return none
 
     async def W2G_play(author, video_url) -> int:
-        url = "https://w2g.tv/rooms/{author}/sync_update"
+        url = f"https://w2g.tv/rooms/{author}/sync_update"
         payload = {"w2g_api_key": W2G_TOKEN, "item_url": url}
+        response = await W2G_helper.W2G_request(url, json=payload)
+        return response.status_code
+
+    async def W2G_add(author, video_url, title="none") -> int:
+        url = f"https://w2g.tv/rooms/{author}/playlists/current/playlist_items/sync_update"
+
+        payload = {
+            "w2g_api_key": W2G_TOKEN,
+            "add_items": [{"url": video_url, "title": title}],
+        }
         response = await W2G_helper.W2G_request(url, json=payload)
         return response.status_code
