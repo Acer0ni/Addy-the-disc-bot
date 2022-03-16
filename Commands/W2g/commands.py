@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import requests
 import json
+from Commands.W2g.helper import W2G_helper
 
 
 load_dotenv()
@@ -10,29 +11,6 @@ load_dotenv()
 # user_data = user_data
 W2G_TOKEN = os.getenv("W2G_TOKEN")
 W2G_ROOM = os.getenv("W2G_ROOM")
-
-
-async def W2G_request(url, **kwargs):
-    headers = {"Accept": "application/json", "Content-Type": "application/json"}
-    if kwargs.get("headers"):
-        kwargs.get("headers").update(headers)
-    return requests.post(url, **kwargs)
-
-
-async def W2G_create_room(video_url):
-    url = "https://w2g.tv/rooms/create.json"
-    payload = {
-        "w2g_api_key": W2G_TOKEN,
-        "share": video_url,
-        "bg_color": "#00ff00",
-        "bg_opacity": "50",
-    }
-    response = await W2G_request(url, json=payload)
-    if response.status_code == 200:
-        content = json.loads(response.content)
-        return content["streamkey"]
-    else:
-        return none
 
 
 class Watch2Gether(commands.Cog):
@@ -57,7 +35,7 @@ class Watch2Gether(commands.Cog):
                 f"You already have a room created. Your url is https://w2g.tv/rooms/{self.user_data[author]} "
             )
             return
-        streamkey = await W2G_create_room(url)
+        streamkey = await W2G_helper.W2G_create_room(url)
         if not streamkey:
             await ctx.send("Something went wrong, please try again.")
         else:
