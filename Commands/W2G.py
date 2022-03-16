@@ -3,11 +3,11 @@ from dotenv import load_dotenv
 import os
 import requests
 import json
-from bot import *
+
 
 load_dotenv()
 # why did this suddenly change from a dict to a sub routine when i moved it
-user_data = user_data
+# user_data = user_data
 W2G_TOKEN = os.getenv("W2G_TOKEN")
 W2G_ROOM = os.getenv("W2G_ROOM")
 
@@ -40,6 +40,8 @@ class Watch2Gether(commands.Cog):
     A suite of commands to help watch videos with friends.
     """
 
+    user_data = {}
+
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
@@ -49,21 +51,19 @@ class Watch2Gether(commands.Cog):
         """
         Creates a room at watch2gether.tv to watch videos with your friends.
         """
-        print(type(user_data))
-
         author = str(ctx.message.author)
-        if author in user_data:
+        if author in self.user_data:
             await ctx.send(
-                f"You already have a room created. Your url is https://w2g.tv/rooms/{data[author]} "
+                f"You already have a room created. Your url is https://w2g.tv/rooms/{self.user_data[author]} "
             )
             return
         streamkey = await W2G_create_room(url)
         if not streamkey:
             await ctx.send("Something went wrong, please try again.")
         else:
-            ctx.send(f"Here is your room! https://w2g.tv/rooms/{streamkey}")
-            user_data[author] = streamkey
-            json_string = json.dumps(user_data)
+            await ctx.send(f"Here is your room! https://w2g.tv/rooms/{streamkey}")
+            self.user_data[author] = streamkey
+            json_string = json.dumps(self.user_data)
             with open("Data/W2G_data.json", "w") as outfile:
                 outfile.write(json_string)
 

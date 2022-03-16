@@ -16,6 +16,7 @@ W2G_TOKEN = os.getenv("W2G_TOKEN")
 W2G_ROOM = os.getenv("W2G_ROOM")
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
+
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
@@ -27,7 +28,7 @@ async def user_loader():
 
 @bot.event
 async def on_ready():
-    user_data = await user_loader
+    Watch2Gether.user_data = await user_loader()
     print(f"{bot.user.name} has connect to Discord:\n")
 
 
