@@ -1,105 +1,121 @@
-import re
 from discord.ext import commands
 from dotenv import load_dotenv
 import os
 import requests
 import json
-load_dotenv()
+from bot import *
 
-W2G_TOKEN = os.getenv('W2G_TOKEN')
-W2G_ROOM = os.getenv('W2G_ROOM')
+load_dotenv()
+# why did this suddenly change from a dict to a sub routine when i moved it
+user_data = user_data
+W2G_TOKEN = os.getenv("W2G_TOKEN")
+W2G_ROOM = os.getenv("W2G_ROOM")
+
+
+async def W2G_request(url, **kwargs):
+    headers = {"Accept": "application/json", "Content-Type": "application/json"}
+    if kwargs.get("headers"):
+        kwargs.get("headers").update(headers)
+    return requests.post(url, **kwargs)
+
+
+async def W2G_create_room(video_url):
+    url = "https://w2g.tv/rooms/create.json"
+    payload = {
+        "w2g_api_key": W2G_TOKEN,
+        "share": video_url,
+        "bg_color": "#00ff00",
+        "bg_opacity": "50",
+    }
+    response = await W2G_request(url, json=payload)
+    if response.status_code == 200:
+        content = json.loads(response.content)
+        return content["streamkey"]
+    else:
+        return none
+
 
 class Watch2Gether(commands.Cog):
     """
     A suite of commands to help watch videos with friends.
     """
+
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
 
     @commands.command(name="create")
-    async def W2G_create_room(self,ctx,args):
-        """Creates a room at watch2gether.tv to watch videos with your friends."""
-        with open('Data/W2G_Data.json') as json_file:
-            data = json.load(json_file)
-        share = args
-        author = str(ctx.message.author)
-        if author in data:
-            await ctx.send(f"You already have a room created. Your url is https://w2g.tv/rooms/{data[author]} ")
-            return
-        headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-        payload = {
-            "w2g_api_key": W2G_TOKEN,
-            "share": share,
-            "bg_color": "#00ff00",
-            "bg_opacity": "50"
-        }
-        response = requests.post("https://w2g.tv/rooms/create.json",headers = headers,data=json.dumps(payload))
-        if response.status_code == 200:
-            content = json.loads(response.content)
-            data[author] = content['streamkey']
-            json_string = json.dumps(data)
-            with open('Data/W2G_data.json','w') as outfile:
-                outfile.write(json_string)
-            await ctx.send(f"Here is your room! https://w2g.tv/rooms/{content['streamkey']}")
-        else:
-            await ctx.send("Something went wrong, please try again.")
+    async def CMD_W2G_create_room(self, ctx, url):
+        """
+        Creates a room at watch2gether.tv to watch videos with your friends.
+        """
+        print(type(user_data))
 
-    @commands.command(name='play')
-    async def W2G_Play(self,ctx,url):
+        author = str(ctx.message.author)
+        if author in user_data:
+            await ctx.send(
+                f"You already have a room created. Your url is https://w2g.tv/rooms/{data[author]} "
+            )
+            return
+        streamkey = await W2G_create_room(url)
+        if not streamkey:
+            await ctx.send("Something went wrong, please try again.")
+        else:
+            ctx.send(f"Here is your room! https://w2g.tv/rooms/{streamkey}")
+            user_data[author] = streamkey
+            json_string = json.dumps(user_data)
+            with open("Data/W2G_data.json", "w") as outfile:
+                outfile.write(json_string)
+
+    @commands.command(name="play")
+    async def W2G_Play(self, ctx, url):
         """
         Plays a video immediately in your personal room, and will create one for you if you don't have one.
-        !play  {video url}
+        !play {video url}
         """
-        with open('Data/W2G_Data.json') as json_file:
+        with open("Data/W2G_Data.json") as json_file:
             data = json.load(json_file)
         author = str(ctx.message.author)
         if author not in data:
-            await Watch2Gether.W2G_create_room(self,ctx,url)
+            await Watch2Gether.W2G_create_room(self, ctx, url)
             return
-        headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-        payload = {
-            "w2g_api_key": W2G_TOKEN,
-            "item_url" : url
-        }
-        response = requests.post(f"https://w2g.tv/rooms/{data[author]}/sync_update",headers = headers,data=json.dumps(payload))
+        headers = {"Accept": "application/json", "Content-Type": "application/json"}
+        payload = {"w2g_api_key": W2G_TOKEN, "item_url": url}
+        response = requests.post(
+            f"https://w2g.tv/rooms/{data[author]}/sync_update",
+            headers=headers,
+            data=json.dumps(payload),
+        )
         if response.status_code == 200:
             await ctx.send("Your video is now playing.")
             await ctx.send(f"Here is your link! https://w2g.tv/rooms/{data[author]}")
         else:
             await ctx.send("Something went wrong, please try again.")
 
-    #use *args to make titles optional
-    @commands.command(name='add')
-    async def W2G_add(self,ctx,url,title = "none"):
+    @commands.command(name="add")
+    async def W2G_add(self, ctx, url, title="none"):
         """
         Add a video to the queue of your personal room. If you do not have a room,it creates one and plays the video for you.
         !add {video url} {title}(optional)
         """
-        with open('Data/W2G_Data.json') as json_file:
+        with open("Data/W2G_Data.json") as json_file:
             data = json.load(json_file)
         author = str(ctx.message.author)
         if author not in data:
-            await Watch2Gether.W2G_create_room(self,ctx,url)
+            await Watch2Gether.W2G_create_room(self, ctx, url)
             return
-        headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
+        headers = {"Accept": "application/json", "Content-Type": "application/json"}
         payload = {
             "w2g_api_key": W2G_TOKEN,
             "add_items": [{"url": url, "title": title}],
         }
-        response = requests.post(f"https://w2g.tv/rooms/{data[author]}/playlists/current/playlist_items/sync_update",headers = headers,data=json.dumps(payload))
+        response = requests.post(
+            f"https://w2g.tv/rooms/{data[author]}/playlists/current/playlist_items/sync_update",
+            headers=headers,
+            data=json.dumps(payload),
+        )
         if response.status_code == 200:
             await ctx.send("Your video is now queued.")
             await ctx.send(f"Here is your link! https://w2g.tv/rooms/{data[author]}")
         else:
             await ctx.send("Something went wrong, please try again.")
-
