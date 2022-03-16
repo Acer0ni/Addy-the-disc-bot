@@ -28,3 +28,9 @@ class W2G_helper:
             return content["streamkey"]
         else:
             return none
+
+    async def W2G_play(author, video_url) -> int:
+        url = "https://w2g.tv/rooms/{author}/sync_update"
+        payload = {"w2g_api_key": W2G_TOKEN, "item_url": url}
+        response = await W2G_helper.W2G_request(url, json=payload)
+        return response.status_code

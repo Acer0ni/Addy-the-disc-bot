@@ -51,22 +51,16 @@ class Watch2Gether(commands.Cog):
         Plays a video immediately in your personal room, and will create one for you if you don't have one.
         !play {video url}
         """
-        with open("Data/W2G_Data.json") as json_file:
-            data = json.load(json_file)
         author = str(ctx.message.author)
-        if author not in data:
+        if author not in self.user_data:
             await Watch2Gether.W2G_create_room(self, ctx, url)
             return
-        headers = {"Accept": "application/json", "Content-Type": "application/json"}
-        payload = {"w2g_api_key": W2G_TOKEN, "item_url": url}
-        response = requests.post(
-            f"https://w2g.tv/rooms/{data[author]}/sync_update",
-            headers=headers,
-            data=json.dumps(payload),
-        )
-        if response.status_code == 200:
+        response = Watch2Gether.W2G_Play(author, url)
+        if response == 200:
             await ctx.send("Your video is now playing.")
-            await ctx.send(f"Here is your link! https://w2g.tv/rooms/{data[author]}")
+            await ctx.send(
+                f"Here is your link! https://w2g.tv/rooms/{self.user_data[author]}"
+            )
         else:
             await ctx.send("Something went wrong, please try again.")
 
