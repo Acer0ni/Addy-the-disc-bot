@@ -124,7 +124,10 @@ class Runescape(commands.Cog):
         #     print(monster)
         #     return
         target_monster = await Runescape.beast_search(self, ctx, monster)
-        await ctx.send(target_monster)
+        monster_string = await Runescape.beast_stats_formatter(
+            self, ctx, target_monster
+        )
+        await ctx.send(monster_string)
 
     async def beast_search(self, ctx, monster):
         url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastSearch.json?term={monster}"
@@ -136,3 +139,8 @@ class Runescape(commands.Cog):
         url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastData.json?beastid={monster_id}"
         response = requests.get(url)
         return response.json()
+
+    async def beast_stats_formatter(self, ctx, monster):
+        newline = "\n"
+        stat_string = f"{monster['name']} {newline} Level:{monster['level']}{newline} Lifepoints:{monster['lifepoints']}"
+        return stat_string
