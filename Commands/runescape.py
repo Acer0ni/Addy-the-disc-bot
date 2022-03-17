@@ -132,15 +132,20 @@ class Runescape(commands.Cog):
     async def beast_search(self, ctx, monster):
         url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastSearch.json?term={monster}"
         response = requests.get(url)
-        monster_id = response.json()
-        return await Runescape.beast_detail_lookup(self, ctx, monster_id[0]["value"])
+        monster = response.json()
+        return await Runescape.beast_detail_lookup(self, ctx, monster)
 
-    async def beast_detail_lookup(self, ctx, monster_id):
-        url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastData.json?beastid={monster_id}"
+    async def beast_detail_lookup(self, ctx, monster, index=0):
+        id = monster[index]
+        url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastData.json?beastid={id['value']}"
         response = requests.get(url)
-        return response.json()
+        response = response.json()
+        if "level" not in response:
+            index = index + 1
+            return await Runescape.beast_detail_lookup(self, ctx, monster, index)
+        else:
+            return response
 
     async def beast_stats_formatter(self, ctx, monster):
         newline = "\n"
-        stat_string = f"{monster['name']} {newline} Level:{monster['level']}{newline} Lifepoints:{monster['lifepoints']}"
-        return stat_string
+        return f"{monster['name']} {newline} Level:{monster['level']}{newline} Lifepoints:{monster['lifepoints']}"
