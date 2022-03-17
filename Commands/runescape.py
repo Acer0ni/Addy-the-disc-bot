@@ -98,7 +98,7 @@ class Runescape(commands.Cog):
             await ctx.send("Sorry, that player is not featured on the Highscores.")
             return
         elif response.status_code != 200:
-            await ctx.send("Sorry something went wrong, please try again. ")
+            await ctx.send("Sorry something went wrong, please try again.")
             return
         formated_response = highscores_formatter(response.content)
         new_line = "\n"
@@ -115,3 +115,46 @@ class Runescape(commands.Cog):
                 activity_string += f"**{activities[x - (len(skill))]}** Rank: {rank:,} Score: {score:,} {new_line}"
         await ctx.send(skill_string)
         await ctx.send(activity_string)
+
+    @commands.command(name="beast")
+    async def cmd_rs3_beast(self, ctx, *args):
+        """
+        Lets you look up a monster in Runescape3.
+
+        """
+        monster = "{}".format(" ".join(args))
+        target_monster = await Runescape.beast_search(self, ctx, monster)
+        monster_string = await Runescape.beast_stats_formatter(
+            self, ctx, target_monster
+        )
+        await ctx.send(monster_string)
+
+    async def beast_search(self, ctx, monster):
+        """
+        Takes in the search term and does the blanket search for that term.
+        """
+        url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastSearch.json?term={monster}"
+        response = requests.get(url)
+        monster = response.json()
+        return await Runescape.beast_detail_lookup(self, ctx, monster)
+
+    async def beast_detail_lookup(self, ctx, monster, index=0):
+        """
+        Attempts to do api call to the specific monster until it finds one suitable.
+        """
+        id = monster[index]
+        url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastData.json?beastid={id['value']}"
+        response = requests.get(url)
+        response = response.json()
+        if "level" not in response:
+            index = index + 1
+            return await Runescape.beast_detail_lookup(self, ctx, monster, index)
+        else:
+            return response
+
+    async def beast_stats_formatter(self, ctx, monster):
+        """
+        Takes in the monster dictionary and formats it into a readable string.
+        """
+        newline = "\n"
+        return f"{monster['name']} {newline} Level:{monster['level']}{newline} Lifepoints:{monster['lifepoints']}"
