@@ -118,11 +118,11 @@ class Runescape(commands.Cog):
 
     @commands.command(name="beast")
     async def cmd_rs3_beast(self, ctx, *args):
+        """
+        Lets you look up a monster in Runescape3.
+
+        """
         monster = "{}".format(" ".join(args))
-        # if monster.isnumeric():
-        #     # handle looking at a specific monster here
-        #     print(monster)
-        #     return
         target_monster = await Runescape.beast_search(self, ctx, monster)
         monster_string = await Runescape.beast_stats_formatter(
             self, ctx, target_monster
@@ -130,12 +130,18 @@ class Runescape(commands.Cog):
         await ctx.send(monster_string)
 
     async def beast_search(self, ctx, monster):
+        """
+        Takes in the search term and does the blanket search for that term.
+        """
         url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastSearch.json?term={monster}"
         response = requests.get(url)
         monster = response.json()
         return await Runescape.beast_detail_lookup(self, ctx, monster)
 
     async def beast_detail_lookup(self, ctx, monster, index=0):
+        """
+        Attempts to do api call to the specific monster until it finds one suitable.
+        """
         id = monster[index]
         url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastData.json?beastid={id['value']}"
         response = requests.get(url)
@@ -147,5 +153,8 @@ class Runescape(commands.Cog):
             return response
 
     async def beast_stats_formatter(self, ctx, monster):
+        """
+        Takes in the monster dictionary and formats it into a readable string.
+        """
         newline = "\n"
         return f"{monster['name']} {newline} Level:{monster['level']}{newline} Lifepoints:{monster['lifepoints']}"
