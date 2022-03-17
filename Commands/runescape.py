@@ -98,7 +98,7 @@ class Runescape(commands.Cog):
             await ctx.send("Sorry, that player is not featured on the Highscores.")
             return
         elif response.status_code != 200:
-            await ctx.send("Sorry something went wrong, please try again. ")
+            await ctx.send("Sorry something went wrong, please try again.")
             return
         formated_response = highscores_formatter(response.content)
         new_line = "\n"
@@ -115,3 +115,24 @@ class Runescape(commands.Cog):
                 activity_string += f"**{activities[x - (len(skill))]}** Rank: {rank:,} Score: {score:,} {new_line}"
         await ctx.send(skill_string)
         await ctx.send(activity_string)
+
+    @commands.command(name="beast")
+    async def cmd_rs3_beast(self, ctx, *args):
+        monster = "{}".format(" ".join(args))
+        # if monster.isnumeric():
+        #     # handle looking at a specific monster here
+        #     print(monster)
+        #     return
+        target_monster = await Runescape.beast_search(self, ctx, monster)
+        await ctx.send(target_monster)
+
+    async def beast_search(self, ctx, monster):
+        url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastSearch.json?term={monster}"
+        response = requests.get(url)
+        monster_id = response.json()
+        return await Runescape.beast_detail_lookup(self, ctx, monster_id[0]["value"])
+
+    async def beast_detail_lookup(self, ctx, monster_id):
+        url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastData.json?beastid={monster_id}"
+        response = requests.get(url)
+        return response.json()
