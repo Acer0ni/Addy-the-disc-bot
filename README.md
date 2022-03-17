@@ -22,7 +22,13 @@ Replies with a random brooklyn 99 quote.
 
 Returns with the stats of the specified player in Runescape 3.
 
-## Create
+### Beastiary Lookup
+
+!beast {monster name}
+
+Returns with the information on the requested monster.
+
+### Create
 
 !create {video url}
 
