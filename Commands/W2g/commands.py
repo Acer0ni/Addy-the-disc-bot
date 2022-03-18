@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import os
 import requests
 import json
-from Commands.W2G.http import W2G_helper
+from Commands.w2g.http import W2G_helper
 
 load_dotenv()
 # why did this suddenly change from a dict to a sub routine when i moved it
