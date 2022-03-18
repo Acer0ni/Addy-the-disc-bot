@@ -146,15 +146,15 @@ class Runescape(commands.Cog):
         url = f"https://secure.runescape.com/m=itemdb_rs/bestiary/beastData.json?beastid={id['value']}"
         response = requests.get(url)
         response = response.json()
-        if "level" not in response:
-            index = index + 1
-            return await Runescape.beast_detail_lookup(self, ctx, monster, index)
-        else:
-            return response
+        # if "level" not in response:
+        #     index = index + 1
+        #     return await Runescape.beast_detail_lookup(self, ctx, monster, index)
+        # else:
+        return response
 
     async def beast_stats_formatter(self, ctx, monster):
         """
         Takes in the monster dictionary and formats it into a readable string.
         """
         newline = "\n"
-        return f"{monster['name']} {newline} Level:{monster['level']}{newline} Lifepoints:{monster['lifepoints']}"
+        return f"{monster.get('name','N/A')} {newline} Level: {monster.get('level','N/A')}{newline} Lifepoints: {monster.get('lifepoints','N/A')} {newline} Exp: {monster.get('xp','N/A')}{newline} Weakness: {monster.get('weakness','N/A')} {newline} Attack: {monster.get('attack','N/A')}{newline} Defence: {monster.get('defence','N/A')}{newline} Magic: {monster.get('magic','N/A')}{newline} Ranged: {monster.get('ranged','N/A')}{newline} Slayer level: {monster.get('slayerlevel','N/A')}{newline} Slayer category: {monster.get('slayercat','N/A')}{newline} Aggressive: {monster.get('aggressive','N/A')}{newline} Poisonous: {monster.get('poisonous','N/A')}{newline} Examine: {monster.get('description','N/A')}"
