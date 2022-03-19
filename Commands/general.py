@@ -3,16 +3,19 @@ import discord
 import random
 import json
 import requests
+from datetime import datetime
+
 
 count = 1
 seans_id = 310226357273493504
-jays_id = 322098392161452033
 
 
 class General(commands.Cog):
     """
     A random assortment of commands.
     """
+
+    start_time = 0
 
     def __init__(self, bot):
         self.bot = bot
@@ -23,6 +26,12 @@ class General(commands.Cog):
         this_guild = member.guild
         channel = this_guild.text_channels[0]
         await channel.send(f"Hi {member.name}, Welcome to my Discord server!")
+
+    @commands.command(name="uptime")
+    async def cmd_uptime(self, ctx):
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        await ctx.send(current_time - self.start_time)
 
     @commands.command(name="count")
     async def command_count(self, ctx):
@@ -51,9 +60,6 @@ class General(commands.Cog):
         """
         Makes me tell you a random Brooklynn 99 quote
         """
-        if ctx.author.id == jays_id:
-            await ctx.send("lul nope")
-            return
         response = requests.get(
             "https://brooklyn-nine-nine-quotes.herokuapp.com/api/v1/quotes/random"
         )
