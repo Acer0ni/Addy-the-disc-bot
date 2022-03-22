@@ -6,8 +6,6 @@ import json
 from Commands.w2g.http import W2G_helper
 
 load_dotenv()
-# why did this suddenly change from a dict to a sub routine when i moved it
-# user_data = user_data
 W2G_TOKEN = os.getenv("W2G_TOKEN")
 W2G_ROOM = os.getenv("W2G_ROOM")
 
@@ -40,10 +38,7 @@ class Watch2Gether(commands.Cog):
             await ctx.send("Something went wrong, please try again.")
         else:
             await ctx.send(f"Here is your room! https://w2g.tv/rooms/{streamkey}")
-            self.user_data[author] = streamkey
-            json_string = json.dumps(self.user_data)
-            with open("Data/W2G_data.json", "w") as outfile:
-                outfile.write(json_string)
+            Watch2Gether.json_saver(self, author, streamkey)
 
     @commands.command(name="play")
     async def CMD_W2G_Play(self, ctx, url):
@@ -67,10 +62,7 @@ class Watch2Gether(commands.Cog):
                 await ctx.send(
                     "something went wrong with room creation, the api may be down please try again later"
                 )
-            self.user_data[author] = streamkey
-            json_string = json.dumps(self.user_data)
-            with open("Data/W2G_data.json", "w") as outfile:
-                outfile.write(json_string)
+            Watch2Gether.json_saver(self, author, streamkey)
             await ctx.send(
                 "something went wrong interacting with your old room, this usually happens because it was not saved and over 24 hours have passed since it was last used."
             )
@@ -104,10 +96,7 @@ class Watch2Gether(commands.Cog):
                 await ctx.send(
                     "something went wrong with room creation, the api may be down please try again later"
                 )
-            self.user_data[author] = streamkey
-            json_string = json.dumps(self.user_data)
-            with open("Data/W2G_data.json", "w") as outfile:
-                outfile.write(json_string)
+            Watch2Gether.json_saver(self, author, streamkey)
             await ctx.send(
                 "something went wrong interacting with your old room, this usually happens because it was not saved and over 24 hours have passed since it was last used."
             )
@@ -117,3 +106,9 @@ class Watch2Gether(commands.Cog):
         else:
             print(response)
             await ctx.send("Something went wrong, please try again.")
+
+    def json_saver(self, author, streamkey):
+        self.user_data[author] = streamkey
+        json_string = json.dumps(self.user_data)
+        with open("Data/W2G_data.json", "w") as outfile:
+            outfile.write(json_string)
