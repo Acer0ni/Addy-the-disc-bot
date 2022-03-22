@@ -156,5 +156,20 @@ class Runescape(commands.Cog):
         """
         Takes in the monster dictionary and formats it into a readable string.
         """
-        newline = "\n"
-        return f"{monster.get('name','N/A')} {newline} Level: {monster.get('level','N/A')}{newline} Lifepoints: {monster.get('lifepoints','N/A')} {newline} Exp: {monster.get('xp','N/A')}{newline} Weakness: {monster.get('weakness','N/A')} {newline} Attack: {monster.get('attack','N/A')}{newline} Defence: {monster.get('defence','N/A')}{newline} Magic: {monster.get('magic','N/A')}{newline} Ranged: {monster.get('ranged','N/A')}{newline} Slayer level: {monster.get('slayerlevel','N/A')}{newline} Slayer category: {monster.get('slayercat','N/A')}{newline} Aggressive: {monster.get('aggressive','N/A')}{newline} Poisonous: {monster.get('poisonous','N/A')}{newline} Examine: {monster.get('description','N/A')}"
+        formated_string = (
+            f"{monster.get('name','N/A')}",
+            f"Level: {monster.get('level','N/A')}",
+            f"Lifepoints: {monster.get('lifepoints','N/A')}"
+            f"Exp: {monster.get('xp','N/A')}",
+            f"Weakness: {monster.get('weakness','N/A')}",
+            f"Attack: {monster.get('attack','N/A')}",
+            f"Defence: {monster.get('defence','N/A')}",
+            f"Magic: {monster.get('magic','N/A')}",
+            f"Ranged: {monster.get('ranged','N/A')}",
+            f"Slayer level: {monster.get('slayerlevel','N/A')}",
+            f"Slayer category: {monster.get('slayercat','N/A')}",
+            f"Aggressive: {monster.get('aggressive','N/A')}",
+            f"Poisonous: {monster.get('poisonous','N/A')}",
+            f"Examine: {monster.get('description','N/A')}",
+        )
+        return "/n".join(formated_string)
