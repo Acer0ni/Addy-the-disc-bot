@@ -61,6 +61,23 @@ class Watch2Gether(commands.Cog):
             await ctx.send(
                 f"Here is your link! https://w2g.tv/rooms/{self.user_data[author]}"
             )
+        elif response == 403:
+            streamkey = await W2G_helper.W2G_create_room(url)
+            if not streamkey:
+                await ctx.send(
+                    "something went wrong with room creation, the api may be down please try again later"
+                )
+            self.user_data[author] = streamkey
+            json_string = json.dumps(self.user_data)
+            with open("Data/W2G_data.json", "w") as outfile:
+                outfile.write(json_string)
+            await ctx.send(
+                "something went wrong interacting with your old room, this usually happens because it was not saved and over 24 hours have passed since it was last used."
+            )
+            await ctx.send(
+                f"we made a new room for you. here is your link: https://w2g.tv/rooms/{streamkey}"
+            )
+
         else:
             await ctx.send("Something went wrong, please try again.")
 
@@ -81,5 +98,22 @@ class Watch2Gether(commands.Cog):
             await ctx.send(
                 f"Here is your link! https://w2g.tv/rooms/{self.user_data[author]}"
             )
+        elif response == 403:
+            streamkey = await W2G_helper.W2G_create_room(url)
+            if not streamkey:
+                await ctx.send(
+                    "something went wrong with room creation, the api may be down please try again later"
+                )
+            self.user_data[author] = streamkey
+            json_string = json.dumps(self.user_data)
+            with open("Data/W2G_data.json", "w") as outfile:
+                outfile.write(json_string)
+            await ctx.send(
+                "something went wrong interacting with your old room, this usually happens because it was not saved and over 24 hours have passed since it was last used."
+            )
+            await ctx.send(
+                f"we made a new room for you. here is your link: https://w2g.tv/rooms/{streamkey}"
+            )
         else:
+            print(response)
             await ctx.send("Something went wrong, please try again.")
