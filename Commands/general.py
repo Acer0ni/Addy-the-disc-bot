@@ -3,7 +3,7 @@ import discord
 import random
 import json
 import requests
-from datetime import datetime
+import datetime, time
 
 
 count = 1
@@ -15,7 +15,11 @@ class General(commands.Cog):
     A random assortment of commands.
     """
 
-    start_time = 0
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f"{self} has been loaded")
+        global startTime
+        startTime = time.time()
 
     def __init__(self, bot):
         self.bot = bot
@@ -29,9 +33,8 @@ class General(commands.Cog):
 
     @commands.command(name="uptime")
     async def cmd_uptime(self, ctx):
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        await ctx.send(current_time - self.start_time)
+        uptime = str(datetime.timedelta(seconds=int(round(time.time() - startTime))))
+        await ctx.send(f"I have been online for {uptime}")
 
     @commands.command(name="count")
     async def command_count(self, ctx):

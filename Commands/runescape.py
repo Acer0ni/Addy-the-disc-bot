@@ -159,7 +159,7 @@ class Runescape(commands.Cog):
         formated_string = (
             f"{monster.get('name','N/A')}",
             f"Level: {monster.get('level','N/A')}",
-            f"Lifepoints: {monster.get('lifepoints','N/A')}"
+            f"Lifepoints: {monster.get('lifepoints','N/A')}",
             f"Exp: {monster.get('xp','N/A')}",
             f"Weakness: {monster.get('weakness','N/A')}",
             f"Attack: {monster.get('attack','N/A')}",
@@ -172,4 +172,4 @@ class Runescape(commands.Cog):
             f"Poisonous: {monster.get('poisonous','N/A')}",
             f"Examine: {monster.get('description','N/A')}",
         )
-        return "/n".join(formated_string)
+        return "\n".join(formated_string)
