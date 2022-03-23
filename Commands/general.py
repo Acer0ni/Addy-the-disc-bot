@@ -33,6 +33,9 @@ class General(commands.Cog):
 
     @commands.command(name="uptime")
     async def cmd_uptime(self, ctx):
+        """
+        Shows how long I have been online for
+        """
         uptime = str(datetime.timedelta(seconds=int(round(time.time() - startTime))))
         await ctx.send(f"I have been online for {uptime}")
 
