@@ -1,6 +1,6 @@
 ### Meet Addy
 
-Addy is the digital manifestation of my ADHD… meaning her commands are all over the place right now. I started this project as an exercise to get more familiar with Python, and it has become an ongoing source of inspiration and exploration.
+I started this project as an exercise to get more familiar with Python, and it has become an ongoing source of inspiration and exploration.
 
 # Commands
 

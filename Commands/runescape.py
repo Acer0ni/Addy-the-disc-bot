@@ -90,7 +90,7 @@ class Runescape(commands.Cog):
         """
         Use this command to look up a player in RS3.
         """
-        username = "{}".format(" ".join(args))
+        username = f'{" ".join(args)}'
         response = requests.get(
             f"https://secure.runescape.com/m=hiscore/index_lite.ws?player={username}"
         )
@@ -122,7 +122,7 @@ class Runescape(commands.Cog):
         Lets you look up a monster in Runescape3.
 
         """
-        monster = "{}".format(" ".join(args))
+        monster = f'{" ".join(args)}'
         target_monster = await Runescape.beast_search(self, ctx, monster)
         monster_string = await Runescape.beast_stats_formatter(
             self, ctx, target_monster
