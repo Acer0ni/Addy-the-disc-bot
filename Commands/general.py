@@ -34,6 +34,10 @@ class General(commands.Cog):
 
     @commands.command(name="coin")
     async def cmd_coin(self, ctx, coin):
+        """
+        looks up and returns the price of certain crypto currencies
+        !coin {coin symbol}
+        """
         coins = {
             "btc": "bitcoin",
             "eth": "ethereum",

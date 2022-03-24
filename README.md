@@ -16,6 +16,20 @@ Replies with the amount of times this command has been run since last restart.
 
 Replies with a random brooklyn 99 quote.
 
+## Coin
+
+### **!coin {coin symbol}**
+
+Returns the price of the looked up coins
+
+Supported coins: eth,btc,matic,sol,dot
+
+## Uptime
+
+### **!uptime**
+
+responds with how long the bot has been online
+
 ## High Scores Lookup
 
 ### **!hs {username}**
