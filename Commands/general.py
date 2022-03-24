@@ -38,13 +38,17 @@ class General(commands.Cog):
         looks up and returns the price of certain crypto currencies
         !coin {coin symbol}
         """
+
         coins = {
             "btc": "bitcoin",
             "eth": "ethereum",
             "dot": "binance-peg-polkadot",
             "matic": "matic-network",
-            "sol": "solace-coin",
+            "sol": "solana",
         }
+        if coin not in coins:
+            await ctx.send("I'm sorry i don't recognize that coin")
+            return
         coin_id = coins[coin]
         url = f"https://api.coingecko.com/api/v3/coins/{coin_id}"
         headers = {"Accept": "application/json"}
