@@ -1,4 +1,6 @@
 from discord.ext import commands
+from addy.models import Coin
+from addy.db import Session
 import random
 import requests
 import json
@@ -37,18 +39,12 @@ class General(commands.Cog):
         looks up and returns the price of certain crypto currencies
         !coin {coin symbol}
         """
-
-        coins = {
-            "btc": "bitcoin",
-            "eth": "ethereum",
-            "dot": "binance-peg-polkadot",
-            "matic": "matic-network",
-            "sol": "solana",
-        }
-        if coin not in coins:
-            await ctx.send("I'm sorry i don't recognize that coin")
-            return
-        coin_id = coins[coin]
+        with Session() as session:
+            coin_obj = session.query(Coin).filter_by(symbol=coin).first()
+            if not coin_obj:
+                await ctx.send("im sorry i cant find that symbol")
+                return
+        coin_id = coin_obj.coingecko_id
         url = f"https://api.coingecko.com/api/v3/coins/{coin_id}"
         headers = {"Accept": "application/json"}
         response = requests.get(url, headers)
