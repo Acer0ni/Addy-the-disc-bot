@@ -72,4 +72,19 @@ pipenv sync
 
 ## config
 
+config is loaded from a .env from the root of the repository. you will need:
+
+```
+DISCORD_TOKEN={your discord bot token here}
+Discord_GUILD={your server name}
+ADDY_COMMAND_PREFIX = {preferred command prefix}
+W2G_TOKEN={your watch2gether api key}
+DB_CREDENTIALS ={postgres username:password}
+DB_HOSTNAME = {postgres hostname}
+```
+
 ## migrate
+
+to generate a new migration, make sure that the model you are trying to migrate is imported in `addy/models/__init__.py`
+
+then run `alembic revision --autogenerate -m "{migration message}"` check the contents that is generated in alembic/version. when it is good run `alembic upgrade head`
