@@ -59,3 +59,17 @@ Plays the specified video immediately in your personal room. If you do not have 
 ### **!add {video url} {title}**
 
 Adds the video to your room's queue. If you do not have a room, it creates a room for you with the specified video.
+
+# Development
+
+## install
+
+installing this application requires pipenv. to install pipenv run `pip3 install pipenv`
+
+```
+pipenv sync
+```
+
+## config
+
+## migrate

@@ -7,13 +7,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 DB_CREDENTIALS = os.getenv("DB_CREDENTIALS")
+DB_HOSTNAME = os.getenv("DB_HOSTNAME")
 from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 config.set_main_option(
-    "sqlalchemy.url", f"postgresql://{DB_CREDENTIALS}@localhost/addy"
+    "sqlalchemy.url", f"postgresql://{DB_CREDENTIALS}@{DB_HOSTNAME}/addy"
 )
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -24,7 +25,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from addy.models.base import Base
+from addy.models import Base
 
 target_metadata = Base.metadata
 
