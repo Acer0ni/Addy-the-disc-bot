@@ -1,5 +1,4 @@
 from discord.ext import commands
-import discord
 import random
 import requests
 import json
@@ -80,7 +79,7 @@ class General(commands.Cog):
         """
         Responds with a word of encouragement
         """
-        with open("Data/encouragement.json") as f:
+        with open("data/encouragement.json") as f:
             encouragement = json.load(f)
         if ctx.author.id == seans_id:
             await ctx.send("Sorry, nothing nice to say about Canadians.")

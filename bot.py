@@ -1,9 +1,9 @@
 import os
 import discord
 import json
-from Commands.general import General
-from Commands.runescape import Runescape
-from Commands.w2g.commands import Watch2Gether
+from addy.commands.general import General
+from addy.commands.runescape import Runescape
+from addy.commands.w2g.commands import Watch2Gether
 from dotenv import load_dotenv
 from discord.ext import commands
 from datetime import datetime
@@ -23,7 +23,7 @@ bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
 
 
 async def user_loader():
-    with open("Data/W2G_Data.json") as json_file:
+    with open("data/W2G_Data.json") as json_file:
         data = json.load(json_file)
     return data
 

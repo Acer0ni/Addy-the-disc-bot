@@ -1,9 +1,8 @@
 from discord.ext import commands
 from dotenv import load_dotenv
 import os
-import requests
 import json
-from Commands.w2g.http import W2G_helper
+from addy.commands.w2g.http import W2G_helper
 
 load_dotenv()
 W2G_TOKEN = os.getenv("W2G_TOKEN")
@@ -110,5 +109,5 @@ class Watch2Gether(commands.Cog):
     def json_saver(self, author, streamkey):
         self.user_data[author] = streamkey
         json_string = json.dumps(self.user_data)
-        with open("Data/W2G_data.json", "w") as outfile:
+        with open("data/W2G_data.json", "w") as outfile:
             outfile.write(json_string)
