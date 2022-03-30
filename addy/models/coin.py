@@ -1,6 +1,8 @@
 from sqlalchemy import Column
-from sqlalchemy.types import Integer, Text, String
+from sqlalchemy.orm import relationship
+from sqlalchemy.types import Integer, String
 from addy.models.base import Base
+from addy.models.relationships import association_table
 
 
 class Coin(Base):
@@ -10,6 +12,7 @@ class Coin(Base):
     name = Column(String(255), unique=False, nullable=True)
     symbol = Column(String(255), unique=False, nullable=True)
     coingecko_id = Column(String(255), unique=False, nullable=True)
+    user = relationship("User", secondary=association_table, back_populates="favorites")
 
     def __repr__(self) -> str:
         return f"<Coin name={self.name} symbol={self.symbol}>"
