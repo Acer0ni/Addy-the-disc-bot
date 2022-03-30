@@ -20,7 +20,7 @@ Replies with a random brooklyn 99 quote.
 
 ### **!coin {coin symbol}**
 
-Returns the price of the looked up coins
+Returns the price of the looked up coins.
 
 Supported coins: eth,btc,matic,sol,dot
 
@@ -28,7 +28,7 @@ Supported coins: eth,btc,matic,sol,dot
 
 ### **!uptime**
 
-responds with how long the bot has been online
+Responds with how long the bot has been online.
 
 ## High Scores Lookup
 
@@ -62,29 +62,29 @@ Adds the video to your room's queue. If you do not have a room, it creates a roo
 
 # Development
 
-## install
+## Install
 
-installing this application requires pipenv. to install pipenv run `pip3 install pipenv`
-
-```
-pipenv sync
-```
-
-## config
-
-config is loaded from a .env from the root of the repository. you will need:
+Installing this application requires Pipenv. To Install Pipenv run `pip3 install pipenv`
 
 ```
-DISCORD_TOKEN={your discord bot token here}
-Discord_GUILD={your server name}
+Pipenv sync
+```
+
+## Config
+
+Config is loaded from a .env from the root of the repository. You will need:
+
+```
+DISCORD_TOKEN = {your discord bot token here}
+Discord_GUILD = {your server name}
 ADDY_COMMAND_PREFIX = {preferred command prefix}
-W2G_TOKEN={your watch2gether api key}
-DB_CREDENTIALS ={postgres username:password}
+W2G_TOKEN = {your watch2gether api key}
+DB_CREDENTIALS = {postgres username:password}
 DB_HOSTNAME = {postgres hostname}
 ```
 
-## migrate
+## Migrate
 
-to generate a new migration, make sure that the model you are trying to migrate is imported in `addy/models/__init__.py`
+To generate a new migration, make sure that the model you are trying to migrate is imported in `addy/models/__init__.py`.
 
-then run `alembic revision --autogenerate -m "{migration message}"` check the contents that is generated in alembic/version. when it is good run `alembic upgrade head`
+Then run `alembic revision --autogenerate -m "{migration message}"` . Check the contents that is generated in alembic/version, when it is good run `alembic upgrade head`.

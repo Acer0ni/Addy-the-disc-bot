@@ -24,10 +24,10 @@ bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
 
 
 async def user_loader():
-    data_file = Path("./data/W2G_Data.json")
+    data_file = Path("./data/W2G_users.json")
     if not data_file.is_file():
         data_file.write_text("{}")
-    with open("data/W2G_Data.json") as json_file:
+    with open("data/W2G_users.json") as json_file:
         data = json.load(json_file)
     return data
 
