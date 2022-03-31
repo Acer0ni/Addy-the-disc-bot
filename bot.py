@@ -5,6 +5,7 @@ import json
 from addy.commands.general import General
 from addy.commands.runescape import Runescape
 from addy.commands.w2g.commands import Watch2Gether
+from addy.commands.crypto import Crypto
 from dotenv import load_dotenv
 from discord.ext import commands
 from datetime import datetime
@@ -43,4 +44,5 @@ async def on_ready():
 bot.add_cog(Runescape(bot))
 bot.add_cog(General(bot))
 bot.add_cog(Watch2Gether(bot))
+bot.add_cog(Crypto(bot))
 bot.run(TOKEN)
