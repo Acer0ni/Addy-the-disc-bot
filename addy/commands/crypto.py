@@ -22,13 +22,7 @@ class Crypto(commands.Cog):
                 await ctx.send("im sorry i cant find that symbol")
                 return
         coin_id = coin_obj.coingecko_id
-        url = f"https://api.coingecko.com/api/v3/coins/{coin_id}"
-        headers = {"Accept": "application/json"}
-        response = requests.get(url, headers)
-        response = response.json()
-        name = response["name"]
-        price = response["market_data"]["current_price"]["usd"]
-        await ctx.send(f"The current price of {name} is ${price:,}")
+        await ctx.send(Crypto.HTTP_helper(coin_id))
 
     @commands.command(name="addcoin")
     async def cmd_addcoin(self, ctx, symbol):
@@ -39,16 +33,20 @@ class Crypto(commands.Cog):
                 session.flush()
             coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
             if not coin_obj:
-                await ctx.send("im sorry i cant find that symbol")
+                await ctx.send("I'm sorry i cant find that symbol")
+                return
+            if coin_obj in user.favorites:
+                await ctx.send("That coin is already in your favorites list")
                 return
             user.favorites.append(coin_obj)
             session.add(user)
             session.commit()
+            response_string = "Favorites: \n"
             for coin in user.favorites:
-                await ctx.send(Crypto.HTTP_helper(coin.symbol))
+                response_string += await Crypto.HTTP_helper(coin.coingecko_id) + " \n"
+            await ctx.send(response_string)
 
     async def HTTP_helper(id):
-
         url = f"https://api.coingecko.com/api/v3/coins/{id}"
         headers = {"Accept": "application/json"}
         response = requests.get(url, headers)
