@@ -6,7 +6,7 @@ from addy.models.relationships import association_table
 
 
 class Coin(Base):
-    __tablename__ = "coin"
+    __tablename__ = "Coin"
 
     id = Column(Integer, primary_key=True, autoincrement="auto")
     name = Column(String(255), unique=False, nullable=True)
