@@ -17,3 +17,6 @@ class User(Base):
 
     def __str__(self) -> str:
         return f"{self.name} favorites:{self.favorites}"
+
+    def emptyfavorites(self):
+        self.favorites = []

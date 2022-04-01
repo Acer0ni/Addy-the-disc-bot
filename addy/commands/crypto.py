@@ -1,6 +1,6 @@
-from poplib import CR
-from discord.ext import commands
 import requests
+
+from discord.ext import commands
 from addy.db import Session
 from addy.models.coin import Coin
 from addy.models.user import User
@@ -73,8 +73,12 @@ class Crypto(commands.Cog):
             new_favorites = [coin for coin in user.favorites if coin.symbol != symbol]
             user.favorites = new_favorites
             if symbol == "deleteall":
-                user.favorites = []
+                user.emptyfavorites()
+                await ctx.send("List emptied")
+                session.commit()
+                return
             session.commit()
+            await ctx.send(f"{symbol} deleted")
             await ctx.send(await Crypto.response_formatter(user.favorites))
 
     async def HTTP_helper(id):
