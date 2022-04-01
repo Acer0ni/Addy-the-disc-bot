@@ -71,6 +71,17 @@ class Crypto(commands.Cog):
                 response_string += await Crypto.HTTP_helper(coin.coingecko_id) + "\n"
             await ctx.send(response_string)
 
+    @commands.command(name="delcoin")
+    async def cmd_delcoin(self, ctx, symbol):
+        with Session() as session:
+            user = await Crypto.get_user(session, str(ctx.author))
+            new_favorites = [coin for coin in user.favorites if coin.symbol != symbol]
+            user.favorites = new_favorites
+            if symbol == "all":
+                user.favorites = []
+            session.commit()
+            await ctx.send(user.favorites)
+
     async def HTTP_helper(id):
         url = f"https://api.coingecko.com/api/v3/coins/{id}"
         headers = {"Accept": "application/json"}
@@ -79,3 +90,8 @@ class Crypto(commands.Cog):
         name = response["name"]
         price = response["market_data"]["current_price"]["usd"]
         return f"The current price of {name} is ${price:,}"
+
+    async def get_user(session, username):
+        return session.query(User).filter_by(name=username).first() or User(
+            name=username
+        )
