@@ -1,3 +1,4 @@
+from poplib import CR
 from discord.ext import commands
 import requests
 from addy.db import Session
@@ -31,10 +32,7 @@ class Crypto(commands.Cog):
         !addcoin {coin symbol}
         """
         with Session() as session:
-            user = session.query(User).filter_by(name=str(ctx.author)).first()
-            if not user:
-                user = User(name=str(ctx.author))
-                session.flush()
+            user = await Crypto.get_user(session, str(ctx.author))
             coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
             if not coin_obj:
                 await ctx.send("I'm sorry i cant find that symbol")
@@ -45,10 +43,8 @@ class Crypto(commands.Cog):
             user.favorites.append(coin_obj)
             session.add(user)
             session.commit()
-            response_string = "Favorites: \n"
-            for coin in user.favorites:
-                response_string += await Crypto.HTTP_helper(coin.coingecko_id) + " \n"
-            await ctx.send(response_string)
+
+            await ctx.send(await Crypto.response_formatter(user.favorites))
 
     @commands.command(name="favorites")
     async def cmd_favorites(self, ctx):
@@ -57,30 +53,29 @@ class Crypto(commands.Cog):
         !favorites
         """
         with Session() as session:
-            user = session.query(User).filter_by(name=str(ctx.author)).first()
-            if not user:
-                user = User(name=str(ctx.author))
-                session.flush()
+            user = await Crypto.get_user(session, str(ctx.author))
             if not user.favorites:
                 await ctx.send(
                     "you do not have any favorites yet. you can add favorites by typing !addcoin {coin symbol}"
                 )
                 return
-            response_string = "Favorites: \n"
-            for coin in user.favorites:
-                response_string += await Crypto.HTTP_helper(coin.coingecko_id) + "\n"
-            await ctx.send(response_string)
+
+            await ctx.send(await Crypto.response_formatter(user.favorites))
 
     @commands.command(name="delcoin")
     async def cmd_delcoin(self, ctx, symbol):
+        """
+        Deletes a coin from your favorites list.
+        !delcoin {coinsymbol} use "deleteall" to clear favorites list.
+        """
         with Session() as session:
             user = await Crypto.get_user(session, str(ctx.author))
             new_favorites = [coin for coin in user.favorites if coin.symbol != symbol]
             user.favorites = new_favorites
-            if symbol == "all":
+            if symbol == "deleteall":
                 user.favorites = []
             session.commit()
-            await ctx.send(user.favorites)
+            await ctx.send(await Crypto.response_formatter(user.favorites))
 
     async def HTTP_helper(id):
         url = f"https://api.coingecko.com/api/v3/coins/{id}"
@@ -90,6 +85,12 @@ class Crypto(commands.Cog):
         name = response["name"]
         price = response["market_data"]["current_price"]["usd"]
         return f"The current price of {name} is ${price:,}"
+
+    async def response_formatter(favorites_list):
+        response_string = "Favorites: \n"
+        for coin in favorites_list:
+            response_string += await Crypto.HTTP_helper(coin.coingecko_id) + "\n"
+        return response_string
 
     async def get_user(session, username):
         return session.query(User).filter_by(name=username).first() or User(
