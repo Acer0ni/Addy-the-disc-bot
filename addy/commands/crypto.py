@@ -26,6 +26,10 @@ class Crypto(commands.Cog):
 
     @commands.command(name="addcoin")
     async def cmd_addcoin(self, ctx, symbol):
+        """
+        adds a coin to your favorites list
+        !addcoin {coin symbol}
+        """
         with Session() as session:
             user = session.query(User).filter_by(name=str(ctx.author)).first()
             if not user:
@@ -44,6 +48,27 @@ class Crypto(commands.Cog):
             response_string = "Favorites: \n"
             for coin in user.favorites:
                 response_string += await Crypto.HTTP_helper(coin.coingecko_id) + " \n"
+            await ctx.send(response_string)
+
+    @commands.command(name="favorites")
+    async def cmd_favorites(self, ctx):
+        """
+        shows the list of your favorites
+        !favorites
+        """
+        with Session() as session:
+            user = session.query(User).filter_by(name=str(ctx.author)).first()
+            if not user:
+                user = User(name=str(ctx.author))
+                session.flush()
+            if not user.favorites:
+                await ctx.send(
+                    "you do not have any favorites yet. you can add favorites by typing !addcoin {coin symbol}"
+                )
+                return
+            response_string = "Favorites: \n"
+            for coin in user.favorites:
+                response_string += await Crypto.HTTP_helper(coin.coingecko_id) + "\n"
             await ctx.send(response_string)
 
     async def HTTP_helper(id):
