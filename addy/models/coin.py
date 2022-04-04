@@ -2,7 +2,7 @@ from sqlalchemy import Column
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import Integer, String
 from addy.models.base import Base
-from addy.models.relationships import association_table
+from addy.models.relationships import user_coin
 
 
 class Coin(Base):
@@ -12,7 +12,8 @@ class Coin(Base):
     name = Column(String(255), unique=False, nullable=True)
     symbol = Column(String(255), unique=False, nullable=True)
     coingecko_id = Column(String(255), unique=False, nullable=True)
-    user = relationship("User", secondary=association_table, back_populates="favorites")
+    user = relationship("User", secondary=user_coin, back_populates="favorites")
+    transactions = relationship("Transactions", backref="coin_id")
 
     def __repr__(self) -> str:
         return f"<Coin name={self.name} symbol={self.symbol}>"
