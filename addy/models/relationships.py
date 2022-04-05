@@ -5,6 +5,6 @@ from addy.models.base import Base
 user_coin = Table(
     "user_coin",
     Base.metadata,
-    Column("users", ForeignKey("User.id")),
-    Column("coin", ForeignKey("Coin.id")),
+    Column("users", ForeignKey("user.id")),
+    Column("coin", ForeignKey("coin.id")),
 )

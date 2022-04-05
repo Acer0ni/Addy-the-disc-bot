@@ -6,15 +6,16 @@ from addy.models.base import Base
 from addy.models.user import User
 
 
-class Transactions(Base):
-    __tablename__ = "Transactions"
+class Transaction(Base):
+    __tablename__ = "transaction"
 
     id = Column(Integer, primary_key=True, autoincrement="auto")
     transaction_date = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-    user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
-    coin_id = Column(Integer, ForeignKey("Coin.id"), nullable=False)
+    wallet_id = Column(Integer, ForeignKey("crypto_wallet.id"), nullable=False)
+    wallet = relationship("Crypto_wallet", back_populates="transactions")
+    coin_id = Column(Integer, ForeignKey("coin.id"), nullable=False)
     transaction_type = Column(Boolean, nullable=False)
     amount_transacted = Column(Float, nullable=False)
     coin_price = Column(Float, nullable=False)

@@ -5,7 +5,7 @@ from discord.ext import commands
 from addy.db import Session
 from addy.models.coin import Coin
 from addy.models.user import User
-from addy.models.transactions import Transactions
+from addy.models.transactions import Transaction
 from enum import Enum
 
 
@@ -31,7 +31,7 @@ class Crypto(commands.Cog):
                 await ctx.send("im sorry i cant find that symbol")
                 return
         coin_id = coin_obj.coingecko_id
-        await ctx.send(Crypto.HTTP_helper(coin_id))
+        await ctx.send(await Crypto.HTTP_helper(coin_id))
 
     @commands.command(name="addcoin")
     async def cmd_addcoin(self, ctx, symbol):
@@ -107,7 +107,7 @@ class Crypto(commands.Cog):
                 )
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
 
-            new_transaction = Transactions(
+            new_transaction = Transaction(
                 user_id=user_obj.id,
                 coin_id=coin_obj.id,
                 transaction_type=TransactionType.BUY,
@@ -140,7 +140,7 @@ class Crypto(commands.Cog):
                     "I am sorry, something went wrong please try again in a few minutes"
                 )
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
-            new_transaction = Transactions(
+            new_transaction = Transaction(
                 user_id=user_obj.id,
                 coin_id=coin_obj.id,
                 transaction_type=False,
@@ -153,10 +153,6 @@ class Crypto(commands.Cog):
             await ctx.send(new_transaction)
             await ctx.send(user_obj.balance)
             await ctx.send(user_obj.transactions)
-
-    async def cog_command_error(self, ctx, error):
-        await super().cog_command_error(ctx, error)
-        await ctx.send(error)
 
     async def get_coin_details(id):
         url = f"https://api.coingecko.com/api/v3/coins/{id}"
