@@ -28,6 +28,7 @@ class AddyBot(commands.Bot):
     async def on_command_error(self, ctx, exception):
         await super().on_command_error(ctx, exception)
         await ctx.send(exception)
+        return exception
 
 
 bot = AddyBot(command_prefix=COMMAND_PREFIX, intents=intents)

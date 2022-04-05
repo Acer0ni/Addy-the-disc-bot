@@ -25,3 +25,6 @@ class User(Base):
 
     def handlebuy(self, amount):
         self.balance = self.balance - amount
+
+    def handlesell(self, amount):
+        self.balance = self.balance + amount

@@ -125,6 +125,35 @@ class Crypto(commands.Cog):
             session.commit()
             await ctx.send(str(new_transaction))
 
+    @commands.command(name="sellcoin")
+    async def cmd_sellcoin(self, ctx, symbol, amount):
+        amount = float(amount)
+        with Session() as session:
+            user_obj = await Crypto.get_user(session, str(ctx.author))
+            coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
+            if not coin_obj:
+                await ctx.send("I'm sorry i cant find that symbol")
+                return
+            detailed_coin = await Crypto.get_coin_details(coin_obj.coingecko_id)
+            if not detailed_coin:
+                await ctx.send(
+                    "I am sorry, something went wrong please try again in a few minutes"
+                )
+            current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
+            new_transaction = Transactions(
+                user_id=user_obj.id,
+                coin_id=coin_obj.id,
+                transaction_type=False,
+                amount_transacted=amount,
+                coin_price=current_price,
+            )
+            user_obj.handlesell(new_transaction.total_price)
+            user_obj.transactions.append(new_transaction)
+            session.commit()
+            await ctx.send(new_transaction)
+            await ctx.send(user_obj.balance)
+            await ctx.send(user_obj.transactions)
+
     async def cog_command_error(self, ctx, error):
         await super().cog_command_error(ctx, error)
         await ctx.send(error)
