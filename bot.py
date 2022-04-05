@@ -21,7 +21,16 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
 COMMAND_PREFIX = os.getenv("ADDY_COMMAND_PREFIX", "!")
 
-bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
+# bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
+
+
+class AddyBot(commands.Bot):
+    async def on_command_error(self, ctx, exception):
+        await super().on_command_error(ctx, exception)
+        await ctx.send(exception)
+
+
+bot = AddyBot(command_prefix=COMMAND_PREFIX, intents=intents)
 
 
 async def user_loader():

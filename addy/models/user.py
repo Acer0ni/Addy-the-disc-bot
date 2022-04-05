@@ -12,7 +12,7 @@ class User(Base):
     name = Column(String(255), unique=True, nullable=False)
     favorites = relationship("Coin", secondary=user_coin, back_populates="user")
     balance = Column(Integer, unique=False, nullable=False, server_default="10000")
-    transactions = relationship("Transactions", backref="user_id")
+    transactions = relationship("Transactions", backref="user")
 
     def __repr__(self) -> str:
         return f"<name={self.name} favorites={self.favorites}>"
@@ -22,3 +22,6 @@ class User(Base):
 
     def emptyfavorites(self):
         self.favorites = []
+
+    def handlebuy(self, amount):
+        self.balance = self.balance - amount

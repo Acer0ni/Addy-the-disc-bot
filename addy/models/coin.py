@@ -13,7 +13,7 @@ class Coin(Base):
     symbol = Column(String(255), unique=False, nullable=True)
     coingecko_id = Column(String(255), unique=False, nullable=True)
     user = relationship("User", secondary=user_coin, back_populates="favorites")
-    transactions = relationship("Transactions", backref="coin_id")
+    transactions = relationship("Transactions", backref="coin")
 
     def __repr__(self) -> str:
         return f"<Coin name={self.name} symbol={self.symbol}>"

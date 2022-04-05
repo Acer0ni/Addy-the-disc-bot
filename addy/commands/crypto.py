@@ -1,9 +1,17 @@
+from multiprocessing.dummy import current_process
 import requests
 
 from discord.ext import commands
 from addy.db import Session
 from addy.models.coin import Coin
 from addy.models.user import User
+from addy.models.transactions import Transactions
+from enum import Enum
+
+
+class TransactionType(Enum):
+    BUY = True
+    SELL = False
 
 
 class Crypto(commands.Cog):
@@ -61,6 +69,8 @@ class Crypto(commands.Cog):
                 return
 
             await ctx.send(await Crypto.response_formatter(user.favorites))
+            transactions = "\n".join([str(t) for t in user.transactions])
+            await ctx.send(f"balance: {user.balance} other:{transactions}")
 
     @commands.command(name="delcoin")
     async def cmd_delcoin(self, ctx, symbol):
@@ -81,11 +91,52 @@ class Crypto(commands.Cog):
             await ctx.send(f"{symbol} deleted")
             await ctx.send(await Crypto.response_formatter(user.favorites))
 
-    async def HTTP_helper(id):
+    @commands.command(name="buycoin")
+    async def cmd_buycoin(self, ctx, symbol, amount):
+        amount = float(amount)
+        with Session() as session:
+            user_obj = await Crypto.get_user(session, str(ctx.author))
+            coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
+            if not coin_obj:
+                await ctx.send("I'm sorry i cant find that symbol")
+                return
+            detailed_coin = await Crypto.get_coin_details(coin_obj.coingecko_id)
+            if not detailed_coin:
+                await ctx.send(
+                    "I am sorry, something went wrong please try again in a few minutes"
+                )
+            current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
+
+            new_transaction = Transactions(
+                user_id=user_obj.id,
+                coin_id=coin_obj.id,
+                transaction_type=TransactionType.BUY,
+                amount_transacted=amount,
+                coin_price=current_price,
+            )
+
+            if new_transaction.total_price > user_obj.balance:
+                await ctx.send(
+                    "I'm sorry you do not have enough money to perform that action"
+                )
+                return
+            user_obj.handlebuy(new_transaction.total_price)
+            user_obj.transactions.append(new_transaction)
+            session.commit()
+            await ctx.send(str(new_transaction))
+
+    async def cog_command_error(self, ctx, error):
+        await super().cog_command_error(ctx, error)
+        await ctx.send(error)
+
+    async def get_coin_details(id):
         url = f"https://api.coingecko.com/api/v3/coins/{id}"
         headers = {"Accept": "application/json"}
         response = requests.get(url, headers)
-        response = response.json()
+        return response.json()
+
+    async def HTTP_helper(id):
+        response = await Crypto.get_coin_details(id)
         name = response["name"]
         price = response["market_data"]["current_price"]["usd"]
         return f"The current price of {name} is ${price:,}"
