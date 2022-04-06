@@ -95,6 +95,11 @@ class Crypto(commands.Cog):
 
     @commands.command(name="buycoin")
     async def cmd_buycoin(self, ctx, symbol, amount):
+        """
+        "buys" a crypto coin and adds it to your wallet
+        you start with $10,000, to reset type !reset
+        !buycoin {symbol} {amount}
+        """
         amount = float(amount)
         with Session() as session:
             user_obj = await Crypto.get_user(session, str(ctx.author))
@@ -142,6 +147,11 @@ class Crypto(commands.Cog):
 
     @commands.command(name="sellcoin")
     async def cmd_sellcoin(self, ctx, symbol, amount):
+        """
+        sells a coin from your wallet.
+        type !reset to reset your wallet and transactions
+        !sellcoin {symbol} {amount}
+        """
         amount = float(amount)
         with Session() as session:
             user_obj = await Crypto.get_user(session, str(ctx.author))
@@ -186,6 +196,10 @@ class Crypto(commands.Cog):
 
     @commands.command(name="wallet")
     async def cmd_show_holding(self, ctx):
+        """
+        shows the users holdings and balance
+        !wallet
+        """
         new_line = "\n"
         with Session() as session:
             user_obj = await Crypto.get_user(session, str(ctx.author))
@@ -201,6 +215,10 @@ class Crypto(commands.Cog):
 
     @commands.command(name="transactions")
     async def cmd_show_transactions(self, ctx):
+        """
+        shows the users transactions
+        !transactions
+        """
         new_line = "\n"
         with Session() as session:
             user_obj = await Crypto.get_user(session, str(ctx.author))
@@ -210,6 +228,26 @@ class Crypto(commands.Cog):
             for transaction in user_transaction:
                 response_string += str(transaction) + "\n"
         await ctx.send(response_string)
+
+    @commands.command(name="test")
+    async def cmd_test(self, ctx):
+        with Session() as session:
+            user_obj = await Crypto.get_user(session, str(ctx.author))
+            user_holdings = user_obj.crypto_wallet.crypto_holdings
+            await ctx.send(user_holdings)
+
+    @commands.command(name="reset")
+    async def cmd_reset(self, ctx):
+        """
+        resets your crypto wallet
+        !reset
+        """
+        with Session() as session:
+            user_obj = await Crypto.get_user(session, str(ctx.author))
+            new_wallet = Crypto_wallet()
+            user_obj.crypto_wallet = new_wallet
+            session.commit()
+            await ctx.send("deletion successful")
 
     async def get_coin_details(id):
         url = f"https://api.coingecko.com/api/v3/coins/{id}"
