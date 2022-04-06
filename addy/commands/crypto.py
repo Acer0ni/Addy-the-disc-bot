@@ -108,12 +108,11 @@ class Crypto(commands.Cog):
                     "I am sorry, something went wrong please try again in a few minutes"
                 )
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
-            await ctx.send(f"Current Price: {current_price}")
             wallet = user_obj.crypto_wallet
             new_transaction = Transaction(
                 wallet=wallet,
                 coin_id=coin_obj.id,
-                transaction_type=True,
+                is_sale=True,
                 amount_transacted=amount,
                 coin_price=current_price,
             )
@@ -174,7 +173,7 @@ class Crypto(commands.Cog):
             new_transaction = Transaction(
                 wallet=wallet,
                 coin_id=coin_obj.id,
-                transaction_type=False,
+                is_sale=False,
                 amount_transacted=amount,
                 coin_price=current_price,
             )
@@ -190,7 +189,7 @@ class Crypto(commands.Cog):
         new_line = "\n"
         with Session() as session:
             user_obj = await Crypto.get_user(session, str(ctx.author))
-            user_holdings = session.query(Crypto_holding).filter_by(
+            user_holdings = session.query(Crypto_holding).filter(
                 Crypto_holding.amount > 0,
                 Crypto_holding.crypto_wallet_id == user_obj.crypto_wallet.id,
             )

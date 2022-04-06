@@ -11,7 +11,7 @@ class Crypto_wallet(Base):
     id = Column(Integer, primary_key=True, autoincrement="auto")
     # balance needs to be a float
     balance = Column(
-        Integer,
+        Float,
         unique=False,
         nullable=False,
         default=10_000,
@@ -23,7 +23,7 @@ class Crypto_wallet(Base):
 
     def handle_balance(self, transaction):
 
-        if transaction.transaction_type:
+        if transaction.is_sale:
             self.balance = self.balance - transaction.total_price
         else:
             self.balance = self.balance + transaction.total_price
