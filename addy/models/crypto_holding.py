@@ -12,3 +12,6 @@ class Crypto_holding(Base):
     amount = Column(Float, nullable=False)
     crypto_wallet_id = Column(Integer, ForeignKey("crypto_wallet.id"))
     crypto_wallet = relationship("Crypto_wallet", back_populates="crypto_holdings")
+
+    def __repr__(self):
+        return f"<Cypto_holding name: {self.name} amount: {self.amount}>"

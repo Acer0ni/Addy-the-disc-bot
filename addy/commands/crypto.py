@@ -2,8 +2,10 @@ import requests
 
 from discord.ext import commands
 from addy.db import Session
+
 from addy.models.coin import Coin
 from addy.models.crypto_wallet import Crypto_wallet
+from addy.models.crypto_holding import Crypto_holding
 from addy.models.transactions import Transaction
 from addy.models.user import User
 
@@ -72,8 +74,10 @@ class Crypto(commands.Cog):
                 return
 
             await ctx.send(await Crypto.response_formatter(user.favorites))
-            # transactions = "\n".join([str(t) for t in user.transactions])
-            # await ctx.send(f"balance: {user.balance} other:{transactions}")
+            transactions = "\n".join([str(t) for t in user.crypto_wallet.transactions])
+            await ctx.send(
+                f"balance: {user.crypto_wallet.balance} other:{transactions}"
+            )
 
     @commands.command(name="delcoin")
     async def cmd_delcoin(self, ctx, symbol):
@@ -123,22 +127,25 @@ class Crypto(commands.Cog):
                     "I'm sorry you do not have enough money to perform that action"
                 )
                 return
+                # change this, one param, transaction
+            wallet.handle_balance(True, new_transaction.total_price)
+            holding = (
+                session.query(Crypto_holding)
+                .filter_by(crypto_wallet_id=wallet.id)
+                .filter_by(coingecko_id=coin_obj.coingecko_id)
+                .first()
+            )
+            if not holding:
+                holding = Crypto_holding(
+                    name=coin_obj.symbol,
+                    coingecko_id=coin_obj.coingecko_id,
+                    amount=amount,
+                    crypto_wallet=wallet,
+                )
+            else:
+                holding.amount += amount
             await ctx.send(wallet.transactions)
-            # new_transaction = Transaction(
-            #     user_id=user_obj.id,
-            #     coin_id=coin_obj.id,
-            #     transaction_type=TransactionType.BUY,
-            #     amount_transacted=amount,
-            #     coin_price=current_price,
-            # )
-
-            # if new_transaction.total_price > user_obj.balance:
-            #     await ctx.send(
-            #         "I'm sorry you do not have enough money to perform that action"
-            #     )
-            #     return
-            # user_obj.handlebuy(new_transaction.total_price)
-            # user_obj.transactions.append(new_transaction)
+            await ctx.send(wallet.crypto_holdings)
             session.commit()
             # await ctx.send(str(new_transaction))
 
