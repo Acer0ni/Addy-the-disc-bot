@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import Integer, DateTime, Boolean, Float
 from sqlalchemy.sql import func
 from addy.models.base import Base
-from addy.models.user import User
 
 
 class Transaction(Base):
@@ -32,4 +31,4 @@ class Transaction(Base):
         return f"({self.transaction_date}) {self.translate_transaction_type()} {self.coin_id} {self.coin_price} {self.amount_transacted} {self.total_price}"
 
     def __repr__(self):
-        return f"<Transaction transaction_time={self.transaction_date} transaction type: {self.translate_transaction_type()} user id:{self.user_id} coin: {self.coin_id} amount: {self.amount_transacted} total price: {self.coin_price}>"
+        return f"<Transaction transaction_time={self.transaction_date} transaction type: {self.translate_transaction_type()}  amount: {self.amount_transacted} total price: {self.coin_price}>"

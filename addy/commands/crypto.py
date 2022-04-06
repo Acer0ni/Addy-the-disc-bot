@@ -1,11 +1,14 @@
-from multiprocessing.dummy import current_process
 import requests
 
 from discord.ext import commands
 from addy.db import Session
 from addy.models.coin import Coin
-from addy.models.user import User
+from addy.models.crypto_wallet import Crypto_wallet
 from addy.models.transactions import Transaction
+from addy.models.user import User
+
+# from addy.models.crypto_wallet import Crypto_wallet
+# from addy.models.transactions import Transaction
 from enum import Enum
 
 
@@ -69,8 +72,8 @@ class Crypto(commands.Cog):
                 return
 
             await ctx.send(await Crypto.response_formatter(user.favorites))
-            transactions = "\n".join([str(t) for t in user.transactions])
-            await ctx.send(f"balance: {user.balance} other:{transactions}")
+            # transactions = "\n".join([str(t) for t in user.transactions])
+            # await ctx.send(f"balance: {user.balance} other:{transactions}")
 
     @commands.command(name="delcoin")
     async def cmd_delcoin(self, ctx, symbol):
@@ -106,24 +109,38 @@ class Crypto(commands.Cog):
                     "I am sorry, something went wrong please try again in a few minutes"
                 )
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
-
+            await ctx.send(f"Current Price: {current_price}")
+            wallet = user_obj.crypto_wallet
             new_transaction = Transaction(
-                user_id=user_obj.id,
+                wallet=wallet,
                 coin_id=coin_obj.id,
-                transaction_type=TransactionType.BUY,
+                transaction_type=True,
                 amount_transacted=amount,
                 coin_price=current_price,
             )
-
-            if new_transaction.total_price > user_obj.balance:
+            if new_transaction.total_price > wallet.balance:
                 await ctx.send(
                     "I'm sorry you do not have enough money to perform that action"
                 )
                 return
-            user_obj.handlebuy(new_transaction.total_price)
-            user_obj.transactions.append(new_transaction)
+            await ctx.send(wallet.transactions)
+            # new_transaction = Transaction(
+            #     user_id=user_obj.id,
+            #     coin_id=coin_obj.id,
+            #     transaction_type=TransactionType.BUY,
+            #     amount_transacted=amount,
+            #     coin_price=current_price,
+            # )
+
+            # if new_transaction.total_price > user_obj.balance:
+            #     await ctx.send(
+            #         "I'm sorry you do not have enough money to perform that action"
+            #     )
+            #     return
+            # user_obj.handlebuy(new_transaction.total_price)
+            # user_obj.transactions.append(new_transaction)
             session.commit()
-            await ctx.send(str(new_transaction))
+            # await ctx.send(str(new_transaction))
 
     @commands.command(name="sellcoin")
     async def cmd_sellcoin(self, ctx, symbol, amount):
@@ -140,19 +157,19 @@ class Crypto(commands.Cog):
                     "I am sorry, something went wrong please try again in a few minutes"
                 )
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
-            new_transaction = Transaction(
-                user_id=user_obj.id,
-                coin_id=coin_obj.id,
-                transaction_type=False,
-                amount_transacted=amount,
-                coin_price=current_price,
-            )
-            user_obj.handlesell(new_transaction.total_price)
-            user_obj.transactions.append(new_transaction)
+            # new_transaction = Transaction(
+            #     user_id=user_obj.id,
+            #     coin_id=coin_obj.id,
+            #     transaction_type=False,
+            #     amount_transacted=amount,
+            #     coin_price=current_price,
+            # )
+            # user_obj.handlesell(new_transaction.total_price)
+            # user_obj.transactions.append(new_transaction)
             session.commit()
-            await ctx.send(new_transaction)
-            await ctx.send(user_obj.balance)
-            await ctx.send(user_obj.transactions)
+            # await ctx.send(new_transaction)
+            # await ctx.send(user_obj.balance)
+            # await ctx.send(user_obj.transactions)
 
     async def get_coin_details(id):
         url = f"https://api.coingecko.com/api/v3/coins/{id}"
@@ -173,6 +190,9 @@ class Crypto(commands.Cog):
         return response_string
 
     async def get_user(session, username):
-        return session.query(User).filter_by(name=username).first() or User(
-            name=username
-        )
+        user = session.query(User).filter_by(name=username).first()
+        if not user:
+            wallet = Crypto_wallet()
+            user = User(name=username, crypto_wallet=wallet)
+            session.commit()
+        return user

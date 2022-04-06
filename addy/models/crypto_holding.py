@@ -8,7 +8,6 @@ class Crypto_holding(Base):
     __tablename__ = "crypto_holdings"
     id = Column(Integer, primary_key=True, autoincrement="auto")
     name = Column(String(255), unique=False, nullable=False)
-    user = relationship("Crypto_wallet", back_populates="crypto_holdings")
     coingecko_id = Column(String(255), unique=False, nullable=False)
     amount = Column(Float, nullable=False)
     crypto_wallet_id = Column(Integer, ForeignKey("crypto_wallet.id"))
