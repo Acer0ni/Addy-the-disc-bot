@@ -186,13 +186,13 @@ class Crypto(commands.Cog):
             holding.amount -= amount
             session.commit()
 
-    @commands.command(name="holding")
+    @commands.command(name="wallet")
     async def cmd_show_holding(self, ctx):
         new_line = "\n"
         with Session() as session:
             user_obj = await Crypto.get_user(session, str(ctx.author))
             user_holdings = user_obj.crypto_wallet.crypto_holdings
-            response_string = f"{ctx.author} Holdings: {new_line} "
+            response_string = f"{ctx.author} Balance: ${user_obj.crypto_wallet.balance}{new_line} Holdings: {new_line} "
 
             for holding in user_holdings:
                 response_string += str(holding) + "\n"
