@@ -28,7 +28,7 @@ class Transaction(Base):
         return "BUY" if self.transaction_type else "SELL"
 
     def __str__(self):
-        return f"({self.transaction_date}) {self.translate_transaction_type()} {self.coin_id} {self.coin_price} {self.amount_transacted} {self.total_price}"
+        return f"time: {self.transaction_date} type:{self.transaction_type} amount: {self.amount_transacted} coin price: {self.coin_price} total: {self.total_price}"
 
     def __repr__(self):
         return f"<Transaction transaction_time={self.transaction_date} transaction type: {self.translate_transaction_type()} coin price: {self.coin_price} amount: {self.amount_transacted} total price: {self.total_price}>"

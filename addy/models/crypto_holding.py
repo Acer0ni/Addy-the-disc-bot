@@ -15,3 +15,6 @@ class Crypto_holding(Base):
 
     def __repr__(self):
         return f"<Cypto_holding name: {self.name} amount: {self.amount}>"
+
+    def __str__(self):
+        return f"name: {self.name} amount: {self.amount}"

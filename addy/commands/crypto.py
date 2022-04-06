@@ -2,6 +2,7 @@ import requests
 
 from discord.ext import commands
 from addy.db import Session
+from addy.models import crypto_wallet
 
 from addy.models.coin import Coin
 from addy.models.crypto_wallet import Crypto_wallet
@@ -74,10 +75,6 @@ class Crypto(commands.Cog):
                 return
 
             await ctx.send(await Crypto.response_formatter(user.favorites))
-            transactions = "\n".join([str(t) for t in user.crypto_wallet.transactions])
-            await ctx.send(
-                f"balance: {user.crypto_wallet.balance} other:{transactions}"
-            )
 
     @commands.command(name="delcoin")
     async def cmd_delcoin(self, ctx, symbol):
@@ -127,8 +124,7 @@ class Crypto(commands.Cog):
                     "I'm sorry you do not have enough money to perform that action"
                 )
                 return
-                # change this, one param, transaction
-            wallet.handle_balance(True, new_transaction.total_price)
+            wallet.handle_balance(new_transaction)
             holding = (
                 session.query(Crypto_holding)
                 .filter_by(crypto_wallet_id=wallet.id)
@@ -164,19 +160,55 @@ class Crypto(commands.Cog):
                     "I am sorry, something went wrong please try again in a few minutes"
                 )
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
-            # new_transaction = Transaction(
-            #     user_id=user_obj.id,
-            #     coin_id=coin_obj.id,
-            #     transaction_type=False,
-            #     amount_transacted=amount,
-            #     coin_price=current_price,
-            # )
-            # user_obj.handlesell(new_transaction.total_price)
-            # user_obj.transactions.append(new_transaction)
+            wallet = user_obj.crypto_wallet
+            holding = (
+                session.query(Crypto_holding)
+                .filter_by(crypto_wallet_id=wallet.id)
+                .filter_by(coingecko_id=coin_obj.coingecko_id)
+                .first()
+            )
+            if not holding:
+                await ctx.send(f"I'm sorry you do not have any {coin_obj.name}")
+                return
+            elif holding.amount < amount:
+                await ctx.send(
+                    f"you do not have enough {coin_obj.name} to sell {amount}"
+                )
+                await ctx.send(f"You currently have {holding.amount} {coin_obj.name}")
+            new_transaction = Transaction(
+                wallet=wallet,
+                coin_id=coin_obj.id,
+                transaction_type=False,
+                amount_transacted=amount,
+                coin_price=current_price,
+            )
+            wallet.handle_balance(new_transaction)
+            holding.amount -= amount
             session.commit()
-            # await ctx.send(new_transaction)
-            # await ctx.send(user_obj.balance)
-            # await ctx.send(user_obj.transactions)
+
+    @commands.command(name="holding")
+    async def cmd_show_holding(self, ctx):
+        new_line = "\n"
+        with Session() as session:
+            user_obj = await Crypto.get_user(session, str(ctx.author))
+            user_holdings = user_obj.crypto_wallet.crypto_holdings
+            response_string = f"{ctx.author} Holdings: {new_line} "
+
+            for holding in user_holdings:
+                response_string += str(holding) + "\n"
+        await ctx.send(response_string)
+
+    @commands.command(name="transactions")
+    async def cmd_show_transactions(self, ctx):
+        new_line = "\n"
+        with Session() as session:
+            user_obj = await Crypto.get_user(session, str(ctx.author))
+            user_transaction = user_obj.crypto_wallet.transactions
+            response_string = f"{ctx.author} Transactions: {new_line}"
+
+            for transaction in user_transaction:
+                response_string += str(transaction) + "\n"
+        await ctx.send(response_string)
 
     async def get_coin_details(id):
         url = f"https://api.coingecko.com/api/v3/coins/{id}"

@@ -21,7 +21,9 @@ class Crypto_wallet(Base):
     crypto_holdings = relationship("Crypto_holding", back_populates="crypto_wallet")
     user = relationship("User", back_populates="crypto_wallet")
 
-    def handle_balance(self, is_purchase, price):
+    def handle_balance(self, transaction):
 
-        if is_purchase:
-            self.balance = self.balance - price
+        if transaction.transaction_type:
+            self.balance = self.balance - transaction.total_price
+        else:
+            self.balance = self.balance + transaction.total_price
