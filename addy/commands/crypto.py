@@ -2,8 +2,6 @@ import requests
 
 from discord.ext import commands
 from addy.db import Session
-from addy.models import crypto_wallet
-
 from addy.models.coin import Coin
 from addy.models.crypto_wallet import Crypto_wallet
 from addy.models.crypto_holding import Crypto_holding
@@ -140,10 +138,8 @@ class Crypto(commands.Cog):
                 )
             else:
                 holding.amount += amount
-            await ctx.send(wallet.transactions)
-            await ctx.send(wallet.crypto_holdings)
+            await ctx.send(holding)
             session.commit()
-            # await ctx.send(str(new_transaction))
 
     @commands.command(name="sellcoin")
     async def cmd_sellcoin(self, ctx, symbol, amount):
@@ -184,14 +180,20 @@ class Crypto(commands.Cog):
             )
             wallet.handle_balance(new_transaction)
             holding.amount -= amount
+            if holding.amount == 0:
+                print("out of this coin")
             session.commit()
+            await ctx.send(holding)
 
     @commands.command(name="wallet")
     async def cmd_show_holding(self, ctx):
         new_line = "\n"
         with Session() as session:
             user_obj = await Crypto.get_user(session, str(ctx.author))
-            user_holdings = user_obj.crypto_wallet.crypto_holdings
+            user_holdings = session.query(Crypto_holding).filter_by(
+                Crypto_holding.amount > 0,
+                Crypto_holding.crypto_wallet_id == user_obj.crypto_wallet.id,
+            )
             response_string = f"{ctx.author} Balance: ${user_obj.crypto_wallet.balance}{new_line} Holdings: {new_line} "
 
             for holding in user_holdings:
