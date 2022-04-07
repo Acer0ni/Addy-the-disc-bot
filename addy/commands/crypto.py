@@ -277,13 +277,13 @@ class Crypto(commands.Cog):
         user = session.query(User).filter_by(name=username).first()
         if not user:
             wallet = Crypto_wallet()
-            print(wallet)
             user = User(name=username, crypto_wallet=wallet)
             session.commit()
         if not user.crypto_wallet:
             wallet = Crypto_wallet()
             user.crypto_wallet = wallet
             session.commit()
+        print(user.crypto_wallet)
         return user
 
     async def tally_holdings(self, ctx, session, user_obj, user_holdings):
