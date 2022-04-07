@@ -79,4 +79,3 @@ class Crypto(commands.Cog):
                 return
             session.commit()
             await ctx.send(f"{symbol} deleted")
-            await ctx.send(await getters.response_formatter(user.favorites))

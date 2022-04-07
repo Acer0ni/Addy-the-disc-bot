@@ -23,7 +23,7 @@ async def bulk_http_get(coin_list):
     coin_ids = ""
     for coin in coin_list:
         coin_ids += f"{coin.coingecko_id},"
-    url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=250&page=1&sparkline=false"
+        url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=250&page=1&sparkline=false"
     response = requests.get(url)
     return response.json()
 
@@ -33,7 +33,7 @@ async def response_formatter(favorites_list):
     response_string = "Favorites: \n"
     new_line = "\n"
     for coin in response:
-        response_string += f"Name: {coin['name']} Price: {coin['current_price']} Daily change: {coin['price_change_percentage_24h']}%{new_line}"
+        response_string += f"Name: {coin['name']} Price: {coin['current_price']} Daily change: {coin['price_change_percentage_24h']}{new_line}"
     return response_string
 
 
