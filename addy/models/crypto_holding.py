@@ -17,4 +17,4 @@ class Crypto_holding(Base):
         return f"<Cypto_holding name: {self.name} amount: {self.amount}>"
 
     def __str__(self):
-        return f"name: {self.name} amount: {self.amount}"
+        return f"Name: {self.name} Amount: {self.amount}"
