@@ -273,6 +273,7 @@ class Crypto(commands.Cog):
         if not user.crypto_wallet:
             wallet = Crypto_wallet()
             user.crypto_wallet = wallet
+            session.commit()
         return user
 
     async def tally_holdings(self, session, user_obj, user_holdings):
