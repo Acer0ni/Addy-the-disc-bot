@@ -9,7 +9,6 @@ class Crypto_wallet(Base):
     __tablename__ = "crypto_wallet"
 
     id = Column(Integer, primary_key=True, autoincrement="auto")
-    # balance needs to be a float
     balance = Column(
         Float,
         unique=False,
