@@ -19,10 +19,21 @@ async def HTTP_helper(id):
     return f"The current price of {name} is ${price:,}"
 
 
+async def bulk_http_get(coin_list):
+    coin_ids = ""
+    for coin in coin_list:
+        coin_ids += f"{coin.coingecko_id},"
+        url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=250&page=1&sparkline=false"
+    response = requests.get(url)
+    return response.json()
+
+
 async def response_formatter(favorites_list):
+    response = await bulk_http_get(favorites_list)
     response_string = "Favorites: \n"
-    for coin in favorites_list:
-        response_string += await HTTP_helper(coin.coingecko_id) + "\n"
+    new_line = "\n"
+    for coin in response:
+        response_string += f"Name: {coin['name']} Price: {coin['current_price']} Daily change: {coin['price_change_percentage_24h']}%{new_line}"
     return response_string
 
 
@@ -41,12 +52,8 @@ async def get_user(session, username):
 
 
 async def tally_holdings(session, user_obj, user_holdings):
-    coin_ids = ""
-    for holding in user_holdings:
-        coin_ids += f"{holding.coingecko_id},"
-    url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=250&page=1&sparkline=false"
-    response = requests.get(url)
-    response = response.json()
+
+    response = await bulk_http_get(user_holdings)
     holdings_total = 0
     for holding in response:
         current_holding = (
