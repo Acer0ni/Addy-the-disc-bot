@@ -279,7 +279,7 @@ class Crypto(commands.Cog):
             wallet = Crypto_wallet()
             user = User(name=username, crypto_wallet=wallet)
             session.commit()
-        if not user.crypto_wallet:
+        if not user.crypto_wallet.id:
             wallet = Crypto_wallet(balance=10000)
             user.crypto_wallet = wallet
             session.commit()
