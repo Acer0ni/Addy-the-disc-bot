@@ -277,6 +277,7 @@ class Crypto(commands.Cog):
         user = session.query(User).filter_by(name=username).first()
         if not user:
             wallet = Crypto_wallet()
+            print(wallet)
             user = User(name=username, crypto_wallet=wallet)
             session.commit()
         if not user.crypto_wallet:
