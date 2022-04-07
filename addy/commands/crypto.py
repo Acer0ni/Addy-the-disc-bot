@@ -204,12 +204,21 @@ class Crypto(commands.Cog):
         new_line = "\n"
         with Session() as session:
             user_obj = await Crypto.get_user(session, str(ctx.author))
-            user_holdings = session.query(Crypto_holding).filter(
-                Crypto_holding.amount > 0,
-                Crypto_holding.crypto_wallet_id == user_obj.crypto_wallet.id,
+            user_holdings = (
+                session.query(Crypto_holding)
+                .filter(
+                    Crypto_holding.amount > 0,
+                    Crypto_holding.crypto_wallet_id == user_obj.crypto_wallet.id,
+                )
+                .all()
             )
+            if not user_holdings:
+                await ctx.send(
+                    f"Balance: {user_obj.crypto_wallet.balance}{new_line} You currently do not have any holdings."
+                )
+                return
             holding_total = await Crypto.tally_holdings(
-                self, session, user_obj, user_holdings
+                self, ctx, session, user_obj, user_holdings
             )
             response_string = f"{ctx.author}{new_line}Balance: ${user_obj.crypto_wallet.balance}{new_line}Holdings: {new_line}Total value: ${holding_total}{new_line}"
 
@@ -276,7 +285,7 @@ class Crypto(commands.Cog):
             session.commit()
         return user
 
-    async def tally_holdings(self, session, user_obj, user_holdings):
+    async def tally_holdings(self, ctx, session, user_obj, user_holdings):
         coin_ids = ""
         for holding in user_holdings:
             coin_ids += f"{holding.coingecko_id},"
