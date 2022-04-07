@@ -17,6 +17,7 @@ class paperTrading(commands.Cog):
         You start with $10,000. To reset, type !reset
         !buycoin {symbol} {amount}
         """
+
         with Session() as session:
             user_obj = await getters.get_user(session, str(ctx.author))
             coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
@@ -30,7 +31,10 @@ class paperTrading(commands.Cog):
                 )
                 return
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
-            amount = getters.amount_calculator(amount, current_price)
+            amount = await getters.amount_calculator(amount, current_price)
+            if amount < 0:
+                await ctx.send("You can not buy a negative amount of crypto")
+                return
             wallet = user_obj.crypto_wallet
             new_transaction = Transaction(
                 wallet=wallet,
@@ -60,7 +64,6 @@ class paperTrading(commands.Cog):
                 )
             else:
                 holding.amount += amount
-            await ctx.send(wallet)
             await ctx.send(holding)
             session.commit()
 
@@ -83,7 +86,10 @@ class paperTrading(commands.Cog):
                     "I'm sorry, something went wrong. Please try again in a few minutes."
                 )
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
-            amount = getters.amount_calculator(amount, current_price)
+            amount = await getters.amount_calculator(amount, current_price)
+            if amount < 0:
+                await ctx.send("You can't sell a negative amount of coins")
+                return
             wallet = user_obj.crypto_wallet
             holding = (
                 session.query(Crypto_holding)
@@ -99,6 +105,7 @@ class paperTrading(commands.Cog):
                     f"You do not have enough {coin_obj.name} to sell {amount}"
                 )
                 await ctx.send(f"You currently have {holding.amount} {coin_obj.name}")
+                return
             new_transaction = Transaction(
                 wallet=wallet,
                 coin_id=coin_obj.id,
@@ -108,8 +115,6 @@ class paperTrading(commands.Cog):
             )
             wallet.handle_balance(new_transaction)
             holding.amount -= amount
-            if holding.amount == 0:
-                print("out of this coin")
             session.commit()
             await ctx.send(holding)
 
