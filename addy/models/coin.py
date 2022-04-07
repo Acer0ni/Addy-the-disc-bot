@@ -6,14 +6,14 @@ from addy.models.relationships import user_coin
 
 
 class Coin(Base):
-    __tablename__ = "Coin"
+    __tablename__ = "coin"
 
     id = Column(Integer, primary_key=True, autoincrement="auto")
-    name = Column(String(255), unique=False, nullable=True)
-    symbol = Column(String(255), unique=False, nullable=True)
-    coingecko_id = Column(String(255), unique=False, nullable=True)
+    name = Column(String(255), unique=False, nullable=False)
+    symbol = Column(String(255), unique=False, nullable=False)
+    coingecko_id = Column(String(255), unique=False, nullable=False)
     user = relationship("User", secondary=user_coin, back_populates="favorites")
-    transactions = relationship("Transactions", backref="coin")
+    transactions = relationship("Transaction", backref="coin")
 
     def __repr__(self) -> str:
         return f"<Coin name={self.name} symbol={self.symbol}>"
