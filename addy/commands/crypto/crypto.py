@@ -3,10 +3,6 @@ import requests
 from discord.ext import commands
 from addy.db import Session
 from addy.models.coin import Coin
-from addy.models.crypto_wallet import Crypto_wallet
-from addy.models.crypto_holding import Crypto_holding
-from addy.models.transactions import Transaction
-from addy.models.user import User
 from addy.commands.crypto.getters import Getters
 
 
