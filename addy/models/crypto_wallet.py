@@ -15,7 +15,7 @@ class Crypto_wallet(Base):
         unique=False,
         nullable=False,
         default=10_000,
-        server_default=text("10000"),
+        server_default="10000",
     )
     transactions = relationship("Transaction", back_populates="wallet")
     crypto_holdings = relationship("Crypto_holding", back_populates="crypto_wallet")
