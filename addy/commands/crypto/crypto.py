@@ -3,7 +3,7 @@ import requests
 from discord.ext import commands
 from addy.db import Session
 from addy.models.coin import Coin
-from addy.commands.crypto.getters import Getters
+import addy.commands.crypto.getters as getters
 
 
 class Crypto(commands.Cog):
@@ -23,7 +23,7 @@ class Crypto(commands.Cog):
                 await ctx.send("I'm sorry, I cant find that symbol.")
                 return
         coin_id = coin_obj.coingecko_id
-        await ctx.send(await Getters.HTTP_helper(coin_id))
+        await ctx.send(await getters.HTTP_helper(coin_id))
 
     @commands.command(name="addcoin")
     async def cmd_addcoin(self, ctx, symbol):
@@ -32,7 +32,7 @@ class Crypto(commands.Cog):
         !addcoin {coin symbol}
         """
         with Session() as session:
-            user = await Getters.get_user(session, str(ctx.author))
+            user = await getters.get_user(session, str(ctx.author))
             coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
             if not coin_obj:
                 await ctx.send("I'm sorry, I cant find that symbol.")
@@ -44,7 +44,7 @@ class Crypto(commands.Cog):
             session.add(user)
             session.commit()
 
-            await ctx.send(await Getters.response_formatter(user.favorites))
+            await ctx.send(await getters.response_formatter(user.favorites))
 
     @commands.command(name="favorites")
     async def cmd_favorites(self, ctx):
@@ -53,14 +53,14 @@ class Crypto(commands.Cog):
         !favorites
         """
         with Session() as session:
-            user = await Getters.get_user(session, str(ctx.author))
+            user = await getters.get_user(session, str(ctx.author))
             if not user.favorites:
                 await ctx.send(
                     "You do not have any favorites yet. You can add favorites by typing !addcoin {coin symbol}"
                 )
                 return
 
-            await ctx.send(await Getters.response_formatter(user.favorites))
+            await ctx.send(await getters.response_formatter(user.favorites))
 
     @commands.command(name="delcoin")
     async def cmd_delcoin(self, ctx, symbol):
@@ -69,7 +69,7 @@ class Crypto(commands.Cog):
         !delcoin {coinsymbol} use "deleteall" to clear favorites list.
         """
         with Session() as session:
-            user = await Getters.get_user(session, str(ctx.author))
+            user = await getters.get_user(session, str(ctx.author))
             new_favorites = [coin for coin in user.favorites if coin.symbol != symbol]
             user.favorites = new_favorites
             if symbol == "deleteall":
@@ -79,4 +79,4 @@ class Crypto(commands.Cog):
                 return
             session.commit()
             await ctx.send(f"{symbol} deleted")
-            await ctx.send(await Getters.response_formatter(user.favorites))
+            await ctx.send(await getters.response_formatter(user.favorites))

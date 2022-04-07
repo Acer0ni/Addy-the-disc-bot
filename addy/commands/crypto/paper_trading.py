@@ -1,15 +1,12 @@
 import requests
 
 from discord.ext import commands
-from addy.commands.crypto.getters import Getters
+import addy.commands.crypto.getters as getters
 from addy.db import Session
 from addy.models.coin import Coin
 from addy.models.crypto_wallet import Crypto_wallet
 from addy.models.crypto_holding import Crypto_holding
 from addy.models.transactions import Transaction
-from addy.models.user import User
-
-from enum import Enum
 
 
 class paperTrading(commands.Cog):
@@ -20,19 +17,24 @@ class paperTrading(commands.Cog):
         You start with $10,000. To reset, type !reset
         !buycoin {symbol} {amount}
         """
-        amount = float(amount)
         with Session() as session:
-            user_obj = await Getters.get_user(session, str(ctx.author))
+            user_obj = await getters.get_user(session, str(ctx.author))
             coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
             if not coin_obj:
                 await ctx.send("I'm sorry, I cant find that symbol.")
                 return
-            detailed_coin = await Getters.get_coin_details(coin_obj.coingecko_id)
+            detailed_coin = await getters.get_coin_details(coin_obj.coingecko_id)
             if not detailed_coin:
                 await ctx.send(
                     "I'm sorry, something went wrong. Please try again in a few minutes."
                 )
+                return
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
+            if amount[0] == "$":
+                dollar_amount = float(amount[1:])
+                amount = dollar_amount / current_price
+            else:
+                amount = float(amount)
             wallet = user_obj.crypto_wallet
             new_transaction = Transaction(
                 wallet=wallet,
@@ -62,6 +64,7 @@ class paperTrading(commands.Cog):
                 )
             else:
                 holding.amount += amount
+            await ctx.send(wallet)
             await ctx.send(holding)
             session.commit()
 
@@ -74,12 +77,12 @@ class paperTrading(commands.Cog):
         """
         amount = float(amount)
         with Session() as session:
-            user_obj = await Getters.get_user(session, str(ctx.author))
+            user_obj = await getters.get_user(session, str(ctx.author))
             coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
             if not coin_obj:
                 await ctx.send("I'm sorry, I cant find that symbol.")
                 return
-            detailed_coin = await Getters.get_coin_details(coin_obj.coingecko_id)
+            detailed_coin = await getters.get_coin_details(coin_obj.coingecko_id)
             if not detailed_coin:
                 await ctx.send(
                     "I'm sorry, something went wrong. Please try again in a few minutes."
@@ -122,7 +125,7 @@ class paperTrading(commands.Cog):
         """
         new_line = "\n"
         with Session() as session:
-            user_obj = await Getters.get_user(session, str(ctx.author))
+            user_obj = await getters.get_user(session, str(ctx.author))
             user_holdings = (
                 session.query(Crypto_holding)
                 .filter(
@@ -136,8 +139,8 @@ class paperTrading(commands.Cog):
                     f"Balance: {user_obj.crypto_wallet.balance}{new_line} You currently do not have any holdings."
                 )
                 return
-            holding_total = await Getters.tally_holdings(
-                self, session, user_obj, user_holdings
+            holding_total = await getters.tally_holdings(
+                session, user_obj, user_holdings
             )
             response_string = f"{ctx.author}{new_line}Balance: ${user_obj.crypto_wallet.balance}{new_line}Holdings: {new_line}Total value: ${holding_total}{new_line}"
 
@@ -153,7 +156,7 @@ class paperTrading(commands.Cog):
         """
         new_line = "\n"
         with Session() as session:
-            user_obj = await Getters.get_user(session, str(ctx.author))
+            user_obj = await getters.get_user(session, str(ctx.author))
             user_transaction = user_obj.crypto_wallet.transactions
             response_string = f"{ctx.author} Transactions: {new_line}"
 
@@ -168,7 +171,7 @@ class paperTrading(commands.Cog):
         !reset
         """
         with Session() as session:
-            user_obj = await Getters.get_user(session, str(ctx.author))
+            user_obj = await getters.get_user(session, str(ctx.author))
             new_wallet = Crypto_wallet()
             user_obj.crypto_wallet = new_wallet
             session.commit()
