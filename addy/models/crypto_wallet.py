@@ -27,3 +27,6 @@ class Crypto_wallet(Base):
             self.balance = self.balance - transaction.total_price
         else:
             self.balance = self.balance + transaction.total_price
+
+    def __str__(self):
+        return f"id: {self.id} holdings: {self.crypto_holdings}"
