@@ -143,7 +143,7 @@ class paperTrading(commands.Cog):
             holding_total = await getters.tally_holdings(
                 session, user_obj, user_holdings
             )
-            response_string = f"{ctx.author}{new_line}Balance: ${user_obj.crypto_wallet.balance}{new_line}Holdings: {new_line}Total value: ${holding_total}{new_line}"
+            response_string = f"{ctx.author}{new_line} Total worth: {user_obj.crypto_wallet.balance + holding_total} Balance: ${user_obj.crypto_wallet.balance}{new_line}Holdings: {new_line}Total value: ${holding_total}{new_line}"
 
             for holding in user_holdings:
                 response_string += str(holding) + "\n"
