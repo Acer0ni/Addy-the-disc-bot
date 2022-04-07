@@ -57,3 +57,12 @@ async def tally_holdings(session, user_obj, user_holdings):
         )
         holdings_total += holding["current_price"] * current_holding.amount
     return holdings_total
+
+
+async def amount_calculator(amount, price):
+    if amount[0] == "$":
+        dollar_amount = float(amount[1:])
+        amount = dollar_amount / price
+    else:
+        amount = float(amount)
+    return amount

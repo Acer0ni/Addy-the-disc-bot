@@ -30,11 +30,7 @@ class paperTrading(commands.Cog):
                 )
                 return
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
-            if amount[0] == "$":
-                dollar_amount = float(amount[1:])
-                amount = dollar_amount / current_price
-            else:
-                amount = float(amount)
+            amount = getters.amount_calculator(amount, current_price)
             wallet = user_obj.crypto_wallet
             new_transaction = Transaction(
                 wallet=wallet,
@@ -75,7 +71,6 @@ class paperTrading(commands.Cog):
         Type !reset to reset your wallet and transactions.
         !sellcoin {symbol} {amount}
         """
-        amount = float(amount)
         with Session() as session:
             user_obj = await getters.get_user(session, str(ctx.author))
             coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
@@ -88,6 +83,7 @@ class paperTrading(commands.Cog):
                     "I'm sorry, something went wrong. Please try again in a few minutes."
                 )
             current_price = float(detailed_coin["market_data"]["current_price"]["usd"])
+            amount = getters.amount_calculator(amount, current_price)
             wallet = user_obj.crypto_wallet
             holding = (
                 session.query(Crypto_holding)
