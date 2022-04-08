@@ -33,7 +33,7 @@ async def response_formatter(favorites_list):
     response_string = "Favorites: \n"
     new_line = "\n"
     for coin in response:
-        response_string += f"Name: {coin['name']} Price: {coin['current_price']} Daily change: {coin['price_change_percentage_24h']}{new_line}"
+        response_string += f"Name: {coin['name']} Price: ${coin['current_price']:,.2f} Daily change: {coin['price_change_percentage_24h']}%{new_line}"
     return response_string
 
 
