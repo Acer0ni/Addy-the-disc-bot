@@ -3,9 +3,12 @@ import requests
 from discord.ext import commands
 import addy.commands.crypto.getters as getters
 from addy.db import Session
+from addy.models import crypto_wallet
 from addy.models.coin import Coin
 from addy.models.crypto_wallet import Crypto_wallet
 from addy.models.crypto_holding import Crypto_holding
+from addy.models.historicalwalletvalue import HistoricalWalletValue
+from addy.models.user import User
 from addy.models.transactions import Transaction
 
 
@@ -177,3 +180,24 @@ class paperTrading(commands.Cog):
             user_obj.crypto_wallet = new_wallet
             session.commit()
             await ctx.send("Deletion successful")
+
+    @commands.command(name="test")
+    async def test(self, ctx):
+
+        with Session() as session:
+            user_list = session.query(User).all()
+            for user in user_list:
+                wallet_balance = user.crypto_wallet.balance
+                holding_total = await getters.tally_holdings(
+                    session, user, user.crypto_wallet.crypto_holdings
+                )
+
+                hwalletvalue = HistoricalWalletValue(
+                    crypto_wallet_id=user.crypto_wallet.id,
+                    usd_balance=wallet_balance,
+                    holdings_balance=holding_total,
+                    total_balance=holding_total + wallet_balance,
+                )
+                session.add(hwalletvalue)
+                session.commit()
+        print("Historical data saved succesfully")

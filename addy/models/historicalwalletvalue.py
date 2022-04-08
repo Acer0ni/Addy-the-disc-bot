@@ -18,3 +18,9 @@ class HistoricalWalletValue(Base):
     holdings_balance = Column(Float, nullable=False)
     total_balance = Column(Float, nullable=False)
     crypto_wallet = relationship("Crypto_wallet", back_populates="historicalvalue")
+
+    def __repr__(self):
+        return f"<Timestamp: {self.timestamp} wallet: {self.crypto_wallet_id} total worth: {self.total_balance} balance: ${self.usd_balance} holding value: {self.holdings_balance}"
+
+    def __str__(self):
+        return f"Timestamp: {self.timestamp} wallet: {self.crypto_wallet_id} total worth: {self.total_balance} balance: ${self.usd_balance} holding value: {self.holdings_balance}"
