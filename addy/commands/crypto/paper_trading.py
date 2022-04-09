@@ -200,4 +200,13 @@ class paperTrading(commands.Cog):
                 )
                 session.add(hwalletvalue)
                 session.commit()
-        print("Historical data saved succesfully")
+            print("Historical data saved succesfully")
+
+    @commands.command(name="cryptohs")
+    async def cmd_crypoths(self, ctx):
+        with Session() as session:
+            user_list = session.query(User).all()
+            for user in user_list:
+                startbalance = session.query(HistoricalWalletValue).filter_by(
+                    crypto_wallet_id=user.crypto_wallet_id
+                )
