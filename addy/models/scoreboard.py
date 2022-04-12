@@ -12,4 +12,7 @@ class Scoreboard(Base):
     timestamp = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-    records = relationship("scoreboardRecord", back_populates="scoreboard")
+    records = relationship("ScoreboardRecord", back_populates="scoreboard")
+
+    def __repr__(self):
+        return f"<scoreboard records: {self.records}>"

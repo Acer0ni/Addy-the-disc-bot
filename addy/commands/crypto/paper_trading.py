@@ -8,6 +8,8 @@ from addy.models.coin import Coin
 from addy.models.crypto_wallet import Crypto_wallet
 from addy.models.crypto_holding import Crypto_holding
 from addy.models.historicalwalletvalue import HistoricalWalletValue
+from addy.models.scoreboard import Scoreboard
+from addy.models.scoreboardrecord import ScoreboardRecord
 from addy.models.user import User
 from addy.models.transactions import Transaction
 
@@ -186,7 +188,14 @@ class paperTrading(commands.Cog):
 
         with Session() as session:
             user_list = session.query(User).all()
+            new_scoreboard = Scoreboard()
             for user in user_list:
+                prev_wallet_balance = (
+                    session.query(HistoricalWalletValue)
+                    .filter_by(crypto_wallet_id=user.crypto_wallet_id)
+                    .order_by(HistoricalWalletValue._id.desc())
+                    .first()
+                )
                 wallet_balance = user.crypto_wallet.balance
                 holding_total = await getters.tally_holdings(
                     session, user, user.crypto_wallet.crypto_holdings
@@ -198,15 +207,30 @@ class paperTrading(commands.Cog):
                     holdings_balance=holding_total,
                     total_balance=holding_total + wallet_balance,
                 )
+                score = hwalletvalue.total_balance - prev_wallet_balance.total_balance
+                new_record = ScoreboardRecord(
+                    scoreboard=new_scoreboard,
+                    user=user,
+                    starting_wallet_balance=prev_wallet_balance,
+                    ending_wallet_balance=hwalletvalue,
+                    score=score,
+                )
                 session.add(hwalletvalue)
-                session.commit()
+                session.add(new_record)
+            session.add(new_scoreboard)
+            session.commit()
             print("Historical data saved succesfully")
 
     @commands.command(name="cryptohs")
     async def cmd_crypoths(self, ctx):
         with Session() as session:
-            user_list = session.query(User).all()
-            for user in user_list:
-                startbalance = session.query(HistoricalWalletValue).filter_by(
-                    crypto_wallet_id=user.crypto_wallet_id
-                )
+            scoreboard = (
+                session.query(Scoreboard).order_by(Scoreboard._id.desc()).first()
+            )
+            scores = sorted(scoreboard.records, key=lambda r: r.score, reverse=True)
+            # fix this and probably the rest of them too
+            new_line = "\n"
+            response_string = f"Highscores:{new_line} "
+            for idx, score in enumerate(scores):
+                response_string += f"{idx +1}. Name: {score.user.name} Score: ${score.score:,.2f}{new_line} "
+            await ctx.send(response_string)
