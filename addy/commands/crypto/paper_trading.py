@@ -4,6 +4,7 @@ from discord.ext import commands
 import addy.commands.crypto.getters as getters
 from addy.db import Session
 from addy.models import crypto_wallet
+from addy.models import user
 from addy.models.coin import Coin
 from addy.models.crypto_wallet import Crypto_wallet
 from addy.models.crypto_holding import Crypto_holding
@@ -179,12 +180,29 @@ class paperTrading(commands.Cog):
         with Session() as session:
             user_obj = await getters.get_user(session, str(ctx.author))
             new_wallet = Crypto_wallet()
+            holding_total = await getters.tally_holdings(
+                session, user_obj, user_obj.crypto_wallet.crypto_holdings
+            )
+            new_hwallet_value = HistoricalWalletValue(
+                crypto_wallet_id=user_obj.crypto_wallet.id,
+                usd_balance=user_obj.crypto_wallet.balance,
+                holdings_balance=holding_total,
+                total_balance=holding_total + user_obj.crypto_wallet.balance,
+            )
+            new_wallet.historicalvalue.append(new_hwallet_value)
             user_obj.crypto_wallet = new_wallet
+
+            session.add(new_wallet)
             session.commit()
             await ctx.send("Deletion successful")
 
     @commands.command(name="test")
     async def test(self, ctx):
+        with Session() as session:
+            pass
+
+    @commands.command(name="gethdata")
+    async def gethdata(self, ctx):
 
         with Session() as session:
             user_list = session.query(User).all()
@@ -196,6 +214,9 @@ class paperTrading(commands.Cog):
                     .order_by(HistoricalWalletValue._id.desc())
                     .first()
                 )
+                if not prev_wallet_balance:
+                    print("skipped")
+                    continue
                 wallet_balance = user.crypto_wallet.balance
                 holding_total = await getters.tally_holdings(
                     session, user, user.crypto_wallet.crypto_holdings
@@ -224,13 +245,18 @@ class paperTrading(commands.Cog):
     @commands.command(name="cryptohs")
     async def cmd_crypoths(self, ctx):
         with Session() as session:
-            scoreboard = (
-                session.query(Scoreboard).order_by(Scoreboard._id.desc()).first()
+            new_scoreboard, old_scoreboard = (
+                session.query(Scoreboard).order_by(Scoreboard._id.desc()).limit(2).all()
             )
-            scores = sorted(scoreboard.records, key=lambda r: r.score, reverse=True)
-            # fix this and probably the rest of them too
-            new_line = "\n"
-            response_string = f"Highscores:{new_line} "
+            scores = sorted(new_scoreboard.records, key=lambda r: r.score, reverse=True)
+            delta = new_scoreboard.timestamp - old_scoreboard.timestamp
+            response_strings = [
+                "Highscores:",
+                f"{old_scoreboard.timestamp:%Y-%m-%d %H:%M} => {new_scoreboard.timestamp:%Y-%m-%d %H:%M} ({delta})",
+            ]
+
             for idx, score in enumerate(scores):
-                response_string += f"{idx +1}. Name: {score.user.name} Score: ${score.score:,.2f}{new_line} "
-            await ctx.send(response_string)
+                response_strings.append(
+                    f"{idx +1}. Name: {score.user.name} Score: ${score.score:,.2f}"
+                )
+            await ctx.send("\n".join(response_strings))

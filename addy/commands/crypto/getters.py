@@ -1,7 +1,9 @@
 import requests
 from addy.db import Session
+from addy.models import historicalwalletvalue
 from addy.models.crypto_wallet import Crypto_wallet
 from addy.models.crypto_holding import Crypto_holding
+from addy.models.historicalwalletvalue import HistoricalWalletValue
 from addy.models.user import User
 
 
@@ -20,10 +22,13 @@ async def HTTP_helper(id):
 
 
 async def bulk_http_get(coin_list):
+    if len(coin_list) == 0:
+        print("no coin list in bulk http get")
+        return None
     coin_ids = ""
     for coin in coin_list:
         coin_ids += f"{coin.coingecko_id},"
-        url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=250&page=1&sparkline=false"
+    url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=250&page=1&sparkline=false"
     response = requests.get(url)
     return response.json()
 
@@ -39,13 +44,24 @@ async def response_formatter(favorites_list):
 
 async def get_user(session, username):
     user = session.query(User).filter_by(name=username).first()
+    holding_total = await tally_holdings(
+        session, user, user.crypto_wallet.crypto_holdings
+    )
+    new_hwallet_value = HistoricalWalletValue(
+        crypto_wallet_id=user.crypto_wallet.id,
+        usd_balance=user.crypto_wallet.balance,
+        holdings_balance=holding_total,
+        total_balance=holding_total + user.crypto_wallet.balance,
+    )
     if not user:
         wallet = Crypto_wallet()
+        wallet.historicalvalue.append(new_hwallet_value)
         user = User(name=username, crypto_wallet=wallet)
         session.add(user)
         session.commit()
     if not user.crypto_wallet.id:
         wallet = Crypto_wallet(balance=10000)
+        wallet.historicalvalue.append(new_hwallet_value)
         user.crypto_wallet = wallet
         session.commit()
     return user
@@ -55,6 +71,9 @@ async def tally_holdings(session, user_obj, user_holdings):
 
     response = await bulk_http_get(user_holdings)
     holdings_total = 0
+    if not response:
+        print("no holdings in tally holdings")
+        return holdings_total
     for holding in response:
         current_holding = (
             session.query(Crypto_holding)
