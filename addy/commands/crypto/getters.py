@@ -42,27 +42,33 @@ async def response_formatter(favorites_list):
     return response_string
 
 
+# this is too big and complicated, figure out how to fix it.
 async def get_user(session, username):
     user = session.query(User).filter_by(name=username).first()
-    holding_total = await tally_holdings(
-        session, user, user.crypto_wallet.crypto_holdings
-    )
-    new_hwallet_value = HistoricalWalletValue(
-        crypto_wallet_id=user.crypto_wallet.id,
-        usd_balance=user.crypto_wallet.balance,
-        holdings_balance=holding_total,
-        total_balance=holding_total + user.crypto_wallet.balance,
-    )
+
     if not user:
-        wallet = Crypto_wallet()
-        wallet.historicalvalue.append(new_hwallet_value)
-        user = User(name=username, crypto_wallet=wallet)
+        print("hi mom")
+        user = User(name=username)
         session.add(user)
         session.commit()
-    if not user.crypto_wallet.id:
-        wallet = Crypto_wallet(balance=10000)
-        wallet.historicalvalue.append(new_hwallet_value)
+    if not user.crypto_wallet:
+        wallet = Crypto_wallet()
+        session.add(wallet)
         user.crypto_wallet = wallet
+        session.flush()
+        holding_total = await tally_holdings(
+            session, user, user.crypto_wallet.crypto_holdings
+        )
+
+        print(wallet)
+        new_hwallet_value = HistoricalWalletValue(
+            crypto_wallet_id=user.crypto_wallet.id,
+            usd_balance=user.crypto_wallet.balance,
+            holdings_balance=holding_total,
+            total_balance=holding_total + user.crypto_wallet.balance,
+        )
+        wallet.historicalvalue.append(new_hwallet_value)
+
         session.commit()
     return user
 
