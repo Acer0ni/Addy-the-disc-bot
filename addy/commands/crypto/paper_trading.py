@@ -3,9 +3,15 @@ import requests
 from discord.ext import commands
 import addy.commands.crypto.getters as getters
 from addy.db import Session
+from addy.models import crypto_wallet
+from addy.models import user
 from addy.models.coin import Coin
 from addy.models.crypto_wallet import Crypto_wallet
 from addy.models.crypto_holding import Crypto_holding
+from addy.models.historicalwalletvalue import HistoricalWalletValue
+from addy.models.scoreboard import Scoreboard
+from addy.models.scoreboardrecord import ScoreboardRecord
+from addy.models.user import User
 from addy.models.transactions import Transaction
 
 
@@ -174,6 +180,40 @@ class paperTrading(commands.Cog):
         with Session() as session:
             user_obj = await getters.get_user(session, str(ctx.author))
             new_wallet = Crypto_wallet()
+            holding_total = await getters.tally_holdings(
+                session, user_obj, user_obj.crypto_wallet.crypto_holdings
+            )
+            new_hwallet_value = HistoricalWalletValue(
+                crypto_wallet_id=user_obj.crypto_wallet.id,
+                usd_balance=user_obj.crypto_wallet.balance,
+                holdings_balance=holding_total,
+                total_balance=holding_total + user_obj.crypto_wallet.balance,
+            )
+            new_wallet.historicalvalue.append(new_hwallet_value)
             user_obj.crypto_wallet = new_wallet
+
+            session.add(new_wallet)
             session.commit()
             await ctx.send("Deletion successful")
+
+    @commands.command(name="cryptohs")
+    async def cmd_crypoths(self, ctx):
+        """
+        Shows yesterdays highscores for paper trading gains.
+        !cryptohs
+        """
+        with Session() as session:
+            new_scoreboard, old_scoreboard = (
+                session.query(Scoreboard).order_by(Scoreboard._id.desc()).limit(2).all()
+            )
+            scores = sorted(new_scoreboard.records, key=lambda r: r.score, reverse=True)
+            delta = new_scoreboard.timestamp - old_scoreboard.timestamp
+            response_strings = [
+                "Highscores:",
+                f"{old_scoreboard.timestamp:%Y-%m-%d %H:%M} => {new_scoreboard.timestamp:%Y-%m-%d %H:%M} ({delta})",
+            ]
+            for idx, score in enumerate(scores):
+                response_strings.append(
+                    f"{idx +1}. Name: {score.user.name} Score: ${score.score:,.2f}"
+                )
+            await ctx.send("\n".join(response_strings))

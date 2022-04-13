@@ -20,6 +20,9 @@ class Crypto_wallet(Base):
     transactions = relationship("Transaction", back_populates="wallet")
     crypto_holdings = relationship("Crypto_holding", back_populates="crypto_wallet")
     user = relationship("User", back_populates="crypto_wallet")
+    historicalvalue = relationship(
+        "HistoricalWalletValue", back_populates="crypto_wallet"
+    )
 
     def handle_balance(self, transaction):
 
@@ -29,4 +32,7 @@ class Crypto_wallet(Base):
             self.balance = self.balance + transaction.total_price
 
     def __str__(self):
-        return f"id: {self.id} holdings: {self.crypto_holdings}"
+        return f"id: {self.id} holdings: {self.crypto_holdings} past values: {self.historicalvalue} balance: {self.balance} "
+
+    def __repr__(self):
+        return f"id: {self.id} balance: {self.balance}"
