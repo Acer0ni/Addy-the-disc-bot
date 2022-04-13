@@ -196,54 +196,12 @@ class paperTrading(commands.Cog):
             session.commit()
             await ctx.send("Deletion successful")
 
-    @commands.command(name="test")
-    async def test(self, ctx):
-        with Session() as session:
-            pass
-
-    @commands.command(name="gethdata")
-    async def gethdata(self, ctx):
-
-        with Session() as session:
-            user_list = session.query(User).all()
-            new_scoreboard = Scoreboard()
-            for user in user_list:
-                prev_wallet_balance = (
-                    session.query(HistoricalWalletValue)
-                    .filter_by(crypto_wallet_id=user.crypto_wallet_id)
-                    .order_by(HistoricalWalletValue._id.desc())
-                    .first()
-                )
-                if not prev_wallet_balance:
-                    print("skipped")
-                    continue
-                wallet_balance = user.crypto_wallet.balance
-                holding_total = await getters.tally_holdings(
-                    session, user, user.crypto_wallet.crypto_holdings
-                )
-
-                hwalletvalue = HistoricalWalletValue(
-                    crypto_wallet_id=user.crypto_wallet.id,
-                    usd_balance=wallet_balance,
-                    holdings_balance=holding_total,
-                    total_balance=holding_total + wallet_balance,
-                )
-                score = hwalletvalue.total_balance - prev_wallet_balance.total_balance
-                new_record = ScoreboardRecord(
-                    scoreboard=new_scoreboard,
-                    user=user,
-                    starting_wallet_balance=prev_wallet_balance,
-                    ending_wallet_balance=hwalletvalue,
-                    score=score,
-                )
-                session.add(hwalletvalue)
-                session.add(new_record)
-            session.add(new_scoreboard)
-            session.commit()
-            print("Historical data saved succesfully")
-
     @commands.command(name="cryptohs")
     async def cmd_crypoths(self, ctx):
+        """
+        Shows yesterdays highscores for paper trading gains.
+        !cryptohs
+        """
         with Session() as session:
             new_scoreboard, old_scoreboard = (
                 session.query(Scoreboard).order_by(Scoreboard._id.desc()).limit(2).all()
@@ -254,7 +212,6 @@ class paperTrading(commands.Cog):
                 "Highscores:",
                 f"{old_scoreboard.timestamp:%Y-%m-%d %H:%M} => {new_scoreboard.timestamp:%Y-%m-%d %H:%M} ({delta})",
             ]
-
             for idx, score in enumerate(scores):
                 response_strings.append(
                     f"{idx +1}. Name: {score.user.name} Score: ${score.score:,.2f}"
