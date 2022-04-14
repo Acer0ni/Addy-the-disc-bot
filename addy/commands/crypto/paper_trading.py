@@ -158,7 +158,7 @@ class paperTrading(commands.Cog):
             ]
 
             for holding in user_holdings:
-                holding_string = f"Name: {holding.name} amount: {holding.amount} value: ${holding_total['coins'][holding.coingecko_id]['value']:,.2f} total value: ${(holding_total['coins'][holding.coingecko_id]['value'] * holding.amount):,.2f}"
+                holding_string = f"{holding.name} {holding.amount} @ ${holding_total['coins'][holding.coingecko_id]['value']:,.2f}ea ({(holding_total['coins'][holding.coingecko_id]['value'] * holding.amount):,.2f})"
                 response_string.append(holding_string)
         await ctx.send("\n".join(response_string))
 
@@ -193,8 +193,8 @@ class paperTrading(commands.Cog):
             new_hwallet_value = HistoricalWalletValue(
                 crypto_wallet_id=user_obj.crypto_wallet.id,
                 usd_balance=user_obj.crypto_wallet.balance,
-                holdings_balance=holding_total,
-                total_balance=holding_total + user_obj.crypto_wallet.balance,
+                holdings_balance=holding_total["total"],
+                total_balance=holding_total["total"] + user_obj.crypto_wallet.balance,
             )
             new_wallet.historicalvalue.append(new_hwallet_value)
             user_obj.crypto_wallet = new_wallet

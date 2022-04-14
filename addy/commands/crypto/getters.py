@@ -64,8 +64,8 @@ async def get_user(session, username):
         new_hwallet_value = HistoricalWalletValue(
             crypto_wallet_id=user.crypto_wallet.id,
             usd_balance=user.crypto_wallet.balance,
-            holdings_balance=holding_total,
-            total_balance=holding_total + user.crypto_wallet.balance,
+            holdings_balance=holding_total["total"],
+            total_balance=holding_total["total"] + user.crypto_wallet.balance,
         )
         wallet.historicalvalue.append(new_hwallet_value)
 
