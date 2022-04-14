@@ -31,8 +31,8 @@ async def createscoreboard():
             hwalletvalue = HistoricalWalletValue(
                 crypto_wallet_id=user.crypto_wallet.id,
                 usd_balance=wallet_balance,
-                holdings_balance=holding_total,
-                total_balance=holding_total + wallet_balance,
+                holdings_balance=holding_total["total"],
+                total_balance=holding_total["total"] + wallet_balance,
             )
             score = hwalletvalue.total_balance - prev_wallet_balance.total_balance
             new_record = ScoreboardRecord(

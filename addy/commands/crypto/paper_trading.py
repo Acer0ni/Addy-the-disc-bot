@@ -149,11 +149,18 @@ class paperTrading(commands.Cog):
             holding_total = await getters.tally_holdings(
                 session, user_obj, user_holdings
             )
-            response_string = f"{ctx.author}{new_line}Total worth: ${(user_obj.crypto_wallet.balance + holding_total):,.2f}{new_line}Balance: ${user_obj.crypto_wallet.balance:,.2f}{new_line}Holdings: {new_line}Total value: ${holding_total:,.2f}{new_line}"
+            response_string = [
+                f"{ctx.author}",
+                f"Total worth: ${(user_obj.crypto_wallet.balance + holding_total['total']):,.2f}",
+                f"Balance: ${user_obj.crypto_wallet.balance:,.2f}",
+                "Holdings: ",
+                f"Total value: ${holding_total['total']:,.2f}",
+            ]
 
             for holding in user_holdings:
-                response_string += str(holding) + "\n"
-        await ctx.send(response_string)
+                holding_string = f"{holding.name} {holding.amount} @ ${holding_total['coins'][holding.coingecko_id]['value']:,.2f}ea ({(holding_total['coins'][holding.coingecko_id]['value'] * holding.amount):,.2f})"
+                response_string.append(holding_string)
+        await ctx.send("\n".join(response_string))
 
     @commands.command(name="transactions")
     async def cmd_show_transactions(self, ctx):
@@ -186,8 +193,8 @@ class paperTrading(commands.Cog):
             new_hwallet_value = HistoricalWalletValue(
                 crypto_wallet_id=user_obj.crypto_wallet.id,
                 usd_balance=user_obj.crypto_wallet.balance,
-                holdings_balance=holding_total,
-                total_balance=holding_total + user_obj.crypto_wallet.balance,
+                holdings_balance=holding_total["total"],
+                total_balance=holding_total["total"] + user_obj.crypto_wallet.balance,
             )
             new_wallet.historicalvalue.append(new_hwallet_value)
             user_obj.crypto_wallet = new_wallet

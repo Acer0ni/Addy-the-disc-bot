@@ -64,8 +64,8 @@ async def get_user(session, username):
         new_hwallet_value = HistoricalWalletValue(
             crypto_wallet_id=user.crypto_wallet.id,
             usd_balance=user.crypto_wallet.balance,
-            holdings_balance=holding_total,
-            total_balance=holding_total + user.crypto_wallet.balance,
+            holdings_balance=holding_total["total"],
+            total_balance=holding_total["total"] + user.crypto_wallet.balance,
         )
         wallet.historicalvalue.append(new_hwallet_value)
 
@@ -76,10 +76,13 @@ async def get_user(session, username):
 async def tally_holdings(session, user_obj, user_holdings):
 
     response = await bulk_http_get(user_holdings)
-    holdings_total = 0
+    holdings_results = {
+        "total": 0,
+        "coins": {},
+    }
     if not response:
         print("no holdings in tally holdings")
-        return holdings_total
+        return holdings_results
     for holding in response:
         current_holding = (
             session.query(Crypto_holding)
@@ -87,8 +90,12 @@ async def tally_holdings(session, user_obj, user_holdings):
             .filter_by(coingecko_id=holding["id"])
             .first()
         )
-        holdings_total += holding["current_price"] * current_holding.amount
-    return holdings_total
+        holdings_results["coins"][current_holding.coingecko_id] = {
+            "amount": current_holding.amount,
+            "value": holding["current_price"],
+        }
+        holdings_results["total"] += holding["current_price"] * current_holding.amount
+    return holdings_results
 
 
 async def amount_calculator(amount, price):
