@@ -25,9 +25,7 @@ async def bulk_http_get(coin_list):
     if len(coin_list) == 0:
         print("no coin list in bulk http get")
         return None
-    coin_ids = ""
-    for coin in coin_list:
-        coin_ids += f"{coin.coingecko_id},"
+    coin_ids = "".join(f"{coin.coingecko_id}," for coin in coin_list)
     url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=250&page=1&sparkline=false"
     response = requests.get(url)
     return response.json()

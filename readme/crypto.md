@@ -34,6 +34,8 @@ Use !delcoin delete all to clear list.
 
 Buys a crypto coin and adds it to your wallet. You start with $10,000.
 
+If you want to buy a specific dollar amount of coins instead of a certain amount of coins make sure to preface your amount with a $.
+
 ## sell
 
 ### **!sellcoin {coin symbol} {amount}**
@@ -57,3 +59,9 @@ Shows the list of transactions you have made.
 ## **!reset**
 
 Resets all of your holdings and transactions. This is irreversible, use at your own risk.
+
+## Highscores
+
+### **!cryptohs**
+
+Shows a scoreboard of all current users based on their wallet growth in the last 24 hours.
