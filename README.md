@@ -35,7 +35,7 @@ DB_CREDENTIALS = {postgres username:password}
 DB_HOSTNAME = {postgres hostname}
 ```
 
-## Scoreboard creation
+## Scoreboard Creation
 
 For `!crytpohs` to work properly `scheduled.py createscoreboard` must be ran on a regular basis. You can do this manually or with various automated means. Right now i am using a cronjob to do it and if you are running this on a linux system heres how.
 
@@ -64,10 +64,10 @@ For `!crytpohs` to work properly `scheduled.py createscoreboard` must be ran on 
     # m h  dom mon dow   command
     0 16 * * * /home/larry/Addy/Addy-the-disc-bot/.venv/bin/python3 /home/larry/Addy/Addy-the-disc-bot/scheduled.py createscoreboard > /home/larry/addy.log 2>&1
 
-In the terminal `crontab -e` to open a crontab file. it may ask you to choose an editor if you don't already have a preferred I would recommend nano. your editor will open up looking something like above. the format for setting up the job is {time to run} {python pathway} {script to run} you can find help knowing how to set up the time [here](https://crontab.guru/)
+In the terminal type `crontab -e` to open a crontab file. It may ask you to choose an editor. If you don't already have a preferred, I would recommend nano. Your editor will open up looking something like above. The format for setting up the job is {time to run} {python pathway} {script to run}. You can find help knowing how to set up the time [here](https://crontab.guru/).
 
 ## Migrate
 
 To generate a new migration, make sure that the model you are trying to migrate is imported in `addy/models/__init__.py`.
 
-Then run `alembic revision --autogenerate -m "{migration message}"` . Check the contents that is generated in alembic/version, when it is good run `alembic upgrade head`.
+Then run `alembic revision --autogenerate -m "{migration message}"`. Check the contents that are generated in alembic/version, when it is good run `alembic upgrade head`.

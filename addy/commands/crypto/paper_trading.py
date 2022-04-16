@@ -21,7 +21,7 @@ class paperTrading(commands.Cog):
         """
         "buys" a crypto coin and adds it to your wallet.
         You start with $10,000. To reset, type !reset
-        !buycoin {symbol} {amount}
+        !buycoin {symbol} {amount} or {$usdamount}
         """
 
         with Session() as session:
@@ -78,7 +78,7 @@ class paperTrading(commands.Cog):
         """
         Sells a coin from your wallet.
         Type !reset to reset your wallet and transactions.
-        !sellcoin {symbol} {amount}
+        !sellcoin {symbol} {amount} or {usd amount}
         """
         with Session() as session:
             user_obj = await getters.get_user(session, str(ctx.author))
@@ -206,7 +206,7 @@ class paperTrading(commands.Cog):
     @commands.command(name="cryptohs")
     async def cmd_crypoths(self, ctx):
         """
-        Shows yesterdays highscores for paper trading gains.
+        Shows highscores for the last 24 hours based on wallet growth.
         !cryptohs
         """
         with Session() as session:

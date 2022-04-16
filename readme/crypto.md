@@ -28,7 +28,7 @@ Use !delcoin delete all to clear list.
 
 # Paper Trading
 
-## buy
+## Buy
 
 ### **!buycoin {coin symbol} {amount}**
 
@@ -36,11 +36,13 @@ Buys a crypto coin and adds it to your wallet. You start with $10,000.
 
 If you want to buy a specific dollar amount of coins instead of a certain amount of coins make sure to preface your amount with a $.
 
-## sell
+## Sell
 
 ### **!sellcoin {coin symbol} {amount}**
 
 Removes the amount of coin from your wallet, and returns the price to your balance.
+
+If you want to buy a specific dollar amount of coins instead of a certain amount of coins make sure to preface your amount with a $.
 
 ## Wallet
 
