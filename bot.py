@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import discord
 import json
+import asyncio
 from addy.commands.general import General
 from addy.commands.runescape import Runescape
 from addy.commands.w2g.commands import Watch2Gether
@@ -11,9 +12,7 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from datetime import datetime
 
-intents = discord.Intents.default()
-intents.members = True
-intents.presences = True
+intents = discord.Intents.all()
 load_dotenv()
 user_data = {}
 W2G_TOKEN = os.getenv("W2G_TOKEN")
@@ -41,10 +40,12 @@ async def on_ready():
     General.start_time = now.strftime("%H:%M:%S")
     print(f"{bot.user.name} has connect to Discord:\n")
 
+async def setup(bot):
+    await bot.add_cog(Runescape(bot))
+    await bot.add_cog(General(bot))
+    await bot.add_cog(paperTrading(bot))
+    await bot.add_cog(Watch2Gether(bot))
+    await bot.add_cog(Crypto(bot))
 
-bot.add_cog(Runescape(bot))
-bot.add_cog(General(bot))
-bot.add_cog(paperTrading(bot))
-bot.add_cog(Watch2Gether(bot))
-bot.add_cog(Crypto(bot))
+asyncio.run(setup(bot))
 bot.run(TOKEN)

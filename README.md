@@ -4,11 +4,11 @@ I started this project as an exercise to get more familiar with Python, and it h
 
 # Commands
 
-[crypto](/readme/crypto.md)
+[Crypto](/readme/crypto.md)
 
-[general](/readme/general.md)
+[General](/readme/general.md)
 
-[runescape](/readme/runescape.md)
+[Runescape](/readme/runescape.md)
 
 [Watch2Gether](/readme/w2g.md)
 
