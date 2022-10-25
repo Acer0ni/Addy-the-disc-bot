@@ -224,3 +224,4 @@ class paperTrading(commands.Cog):
                     f"{idx +1}. Name: {score.user.name} Score: ${score.score:,.2f}"
                 )
             await ctx.send("\n".join(response_strings))
+
