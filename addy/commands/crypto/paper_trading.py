@@ -224,15 +224,4 @@ class paperTrading(commands.Cog):
                     f"{idx +1}. Name: {score.user.name} Score: ${score.score:,.2f}"
                 )
             await ctx.send("\n".join(response_strings))
-    
-    @commands.command(name ="seed")
-    async def seed_users(self,ctx):
-        discord_users = list(ctx.bot.get_all_members())
-        with Session() as session:
-            db_users = session.query(User).all()
-            for db_user in db_users:
-                if member := ctx.guild.get_member_named(db_user.name):
-                    print(f"{db_user.name} found in guild")
-                    print(member.id)
-                    db_user.discord_id = member.id
-                    session.commit()
+

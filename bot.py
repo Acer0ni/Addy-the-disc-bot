@@ -5,6 +5,7 @@ import json
 import asyncio
 
 from requests import Session
+from sqlalchemy import null
 from addy.commands.general import General
 from addy.db import Session
 from addy.commands.runescape import Runescape
@@ -27,7 +28,18 @@ COMMAND_PREFIX = os.getenv("ADDY_COMMAND_PREFIX", "!")
 
 bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
 
-
+async def seed_users():
+    discord_users = list(bot.get_all_members())
+    with Session() as session:
+        db_users = session.query(User).all()
+        for db_user in db_users:
+            for discord_user in discord_users:
+                if db_user.name == str(discord_user):
+                    print(f"db_name {db_user.name} disc name {str(discord_user)}")
+                    if db_user.discord_id == null:
+                        print("id added")
+                        db_user.discord_id = discord_user.id
+                    
 
 async def user_loader():
     data_file = Path("./data/W2G_users.json")
@@ -42,6 +54,7 @@ async def user_loader():
 async def on_ready():
     Watch2Gether.user_data = await user_loader()
     now = datetime.now()
+    await seed_users()
     General.start_time = now.strftime("%H:%M:%S")
     print(f"{bot.user.name} has connect to Discord:\n")
 
