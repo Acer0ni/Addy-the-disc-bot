@@ -36,9 +36,7 @@ async def seed_users():
             for discord_user in discord_users:
                 if db_user.name == str(discord_user):
                     print(f"db_name {db_user.name} disc name {str(discord_user)}")
-                    if db_user.discord_id == null:
-                        print("id added")
-                        db_user.discord_id = discord_user.id
+                    db_user.discord_id = discord_user.id
                     
 
 async def user_loader():
