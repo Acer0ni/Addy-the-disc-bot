@@ -3,11 +3,15 @@ from pathlib import Path
 import discord
 import json
 import asyncio
+
+from requests import Session
 from addy.commands.general import General
+from addy.db import Session
 from addy.commands.runescape import Runescape
 from addy.commands.w2g.commands import Watch2Gether
 from addy.commands.crypto.crypto import Crypto
 from addy.commands.crypto.paper_trading import paperTrading
+from addy.models.user import User
 from dotenv import load_dotenv
 from discord.ext import commands
 from datetime import datetime
@@ -22,6 +26,7 @@ GUILD = os.getenv("DISCORD_GUILD")
 COMMAND_PREFIX = os.getenv("ADDY_COMMAND_PREFIX", "!")
 
 bot = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
+
 
 
 async def user_loader():
