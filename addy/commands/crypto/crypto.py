@@ -32,7 +32,7 @@ class Crypto(commands.Cog):
         !addcoin {coin symbol}
         """
         with Session() as session:
-            user = await getters.get_user(session, str(ctx.author))
+            user = await getters.get_user(session, ctx.author)
             coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
             if not coin_obj:
                 await ctx.send("I'm sorry, I cant find that symbol.")
@@ -53,7 +53,7 @@ class Crypto(commands.Cog):
         !favorites
         """
         with Session() as session:
-            user = await getters.get_user(session, str(ctx.author))
+            user = await getters.get_user(session, ctx.author)
             if not user.favorites:
                 await ctx.send(
                     "You do not have any favorites yet. You can add favorites by typing !addcoin {coin symbol}"
@@ -69,7 +69,7 @@ class Crypto(commands.Cog):
         !delcoin {coinsymbol} use "deleteall" to clear favorites list.
         """
         with Session() as session:
-            user = await getters.get_user(session, str(ctx.author))
+            user = await getters.get_user(session, ctx.author)
             new_favorites = [coin for coin in user.favorites if coin.symbol != symbol]
             user.favorites = new_favorites
             if symbol == "deleteall":
