@@ -37,6 +37,7 @@ async def seed_users():
                 if db_user.name == str(discord_user):
                     print(f"db_name {db_user.name} disc name {str(discord_user)}")
                     db_user.discord_id = discord_user.id
+                    session.commit()
                     
 
 async def user_loader():

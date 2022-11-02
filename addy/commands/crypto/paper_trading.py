@@ -25,7 +25,7 @@ class paperTrading(commands.Cog):
         """
 
         with Session() as session:
-            user_obj = await getters.get_user(session, str(ctx.author))
+            user_obj = await getters.get_user(session, ctx.author)
             coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
             if not coin_obj:
                 await ctx.send("I'm sorry, I cant find that symbol.")
@@ -81,7 +81,7 @@ class paperTrading(commands.Cog):
         !sellcoin {symbol} {amount} or {usd amount}
         """
         with Session() as session:
-            user_obj = await getters.get_user(session, str(ctx.author))
+            user_obj = await getters.get_user(session, ctx.author)
             coin_obj = session.query(Coin).filter_by(symbol=symbol).first()
             if not coin_obj:
                 await ctx.send("I'm sorry, I cant find that symbol.")
@@ -132,7 +132,7 @@ class paperTrading(commands.Cog):
         """
         new_line = "\n"
         with Session() as session:
-            user_obj = await getters.get_user(session, str(ctx.author))
+            user_obj = await getters.get_user(session, ctx.author)
             user_holdings = (
                 session.query(Crypto_holding)
                 .filter(
@@ -170,7 +170,7 @@ class paperTrading(commands.Cog):
         """
         new_line = "\n"
         with Session() as session:
-            user_obj = await getters.get_user(session, str(ctx.author))
+            user_obj = await getters.get_user(session, ctx.author)
             user_transaction = user_obj.crypto_wallet.transactions
             response_string = f"{ctx.author} Transactions: {new_line}"
 
@@ -185,7 +185,7 @@ class paperTrading(commands.Cog):
         !reset
         """
         with Session() as session:
-            user_obj = await getters.get_user(session, str(ctx.author))
+            user_obj = await getters.get_user(session, ctx.author)
             new_wallet = Crypto_wallet()
             holding_total = await getters.tally_holdings(
                 session, user_obj, user_obj.crypto_wallet.crypto_holdings

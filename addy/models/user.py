@@ -11,7 +11,7 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, autoincrement="auto")
-    discord_id = Column(BigInteger, unique=True,nullable= True)
+    discord_id = Column(BigInteger, unique=True,nullable= True,index = True)
     name = Column(String(255), unique=True, nullable=False)
     favorites = relationship("Coin", secondary=user_coin, back_populates="user")
     crypto_wallet_id = Column(Integer, ForeignKey("crypto_wallet.id"), nullable=True)
@@ -25,3 +25,6 @@ class User(Base):
 
     def emptyfavorites(self):
         self.favorites = []
+
+    #create a user the necessary required values are present, name discord_id.
+    # when empty favorites is called assert that user.favorites is an empty.

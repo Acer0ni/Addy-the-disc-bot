@@ -6,7 +6,7 @@ from addy.models.crypto_holding import Crypto_holding
 from addy.models.historicalwalletvalue import HistoricalWalletValue
 from addy.models.user import User
 
-
+#pass in an id, and assert that the response is what i expect.
 async def get_coin_details(id):
     url = f"https://api.coingecko.com/api/v3/coins/{id}"
     headers = {"Accept": "application/json"}
@@ -30,7 +30,7 @@ async def bulk_http_get(coin_list):
     response = requests.get(url)
     return response.json()
 
-
+# call bullk http_get before this and just take in that json
 async def response_formatter(favorites_list):
     response = await bulk_http_get(favorites_list)
     response_string = "Favorites: \n"
@@ -41,33 +41,33 @@ async def response_formatter(favorites_list):
 
 
 # this is too big and complicated, figure out how to fix it.
-async def get_user(session, username):
-    user = session.query(User).filter_by(name=username).first()
-
-    if not user:
-        print("hi mom")
-        user = User(name=username)
+async def get_user(session, author):
+    try:
+        user = session.query(User).get(discord_id = author.id)
+    except TypeError:
+        print("type error or user not found.")
+        user = User(name=author.name,discord_id=author.id)
         session.add(user)
         session.commit()
-    if not user.crypto_wallet:
-        wallet = Crypto_wallet()
-        session.add(wallet)
-        user.crypto_wallet = wallet
-        session.flush()
-        holding_total = await tally_holdings(
-            session, user, user.crypto_wallet.crypto_holdings
-        )
+    finally:
+        if not user.crypto_wallet:
+            wallet = Crypto_wallet()
+            session.add(wallet)
+            user.crypto_wallet = wallet
+            session.flush()
+            holding_total = await tally_holdings(
+                session, user, user.crypto_wallet.crypto_holdings
+            )
+            print(wallet)
+            new_hwallet_value = HistoricalWalletValue(
+                crypto_wallet_id=user.crypto_wallet.id,
+                usd_balance=user.crypto_wallet.balance,
+                holdings_balance=holding_total["total"],
+                total_balance=holding_total["total"] + user.crypto_wallet.balance,
+            )
+            wallet.historicalvalue.append(new_hwallet_value)
 
-        print(wallet)
-        new_hwallet_value = HistoricalWalletValue(
-            crypto_wallet_id=user.crypto_wallet.id,
-            usd_balance=user.crypto_wallet.balance,
-            holdings_balance=holding_total["total"],
-            total_balance=holding_total["total"] + user.crypto_wallet.balance,
-        )
-        wallet.historicalvalue.append(new_hwallet_value)
-
-        session.commit()
+            session.commit()
     return user
 
 
