@@ -14,9 +14,7 @@ class User(Base):
     discord_id = Column(BigInteger, unique=True,nullable= True,index = True)
     name = Column(String(255), unique=True, nullable=False)
     favorites = relationship("Coin", secondary=user_coin, back_populates="user")
-    crypto_wallet_id = Column(Integer, ForeignKey("crypto_wallet.id"), nullable=True)
-    crypto_wallet = relationship("Crypto_wallet", back_populates="user", uselist=False)
-
+    
     def __repr__(self) -> str:
         return f"<name={self.name} favorites={self.favorites}>"
 

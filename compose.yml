@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:17-bookworm
+    restart: unless-stopped
+    env_file: db.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data 
+  bot:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - type: bind 
+        source: ./
+        target: /app
+    env_file:
+      - bot.env
+    depends_on:
+      - db
+    
+  
+volumes:
+  pgdata:

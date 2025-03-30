@@ -9,9 +9,7 @@ from sqlalchemy import null
 from addy.commands.general import General
 from addy.db import Session
 from addy.commands.runescape import Runescape
-from addy.commands.w2g.commands import Watch2Gether
 from addy.commands.crypto.crypto import Crypto
-from addy.commands.crypto.paper_trading import paperTrading
 from addy.models.user import User
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -40,18 +38,11 @@ async def seed_users():
                     session.commit()
                     
 
-async def user_loader():
-    data_file = Path("./data/W2G_users.json")
-    if not data_file.is_file():
-        data_file.write_text("{}")
-    with open("data/W2G_users.json") as json_file:
-        data = json.load(json_file)
-    return data
+
 
 
 @bot.event
 async def on_ready():
-    Watch2Gether.user_data = await user_loader()
     now = datetime.now()
     await seed_users()
     General.start_time = now.strftime("%H:%M:%S")
@@ -60,8 +51,6 @@ async def on_ready():
 async def setup(bot):
     await bot.add_cog(Runescape(bot))
     await bot.add_cog(General(bot))
-    await bot.add_cog(paperTrading(bot))
-    await bot.add_cog(Watch2Gether(bot))
     await bot.add_cog(Crypto(bot))
 
 asyncio.run(setup(bot))

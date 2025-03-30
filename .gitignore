@@ -2,6 +2,7 @@
 .vscode
 W2G_Data.json
 .DS_Store
+*.env
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

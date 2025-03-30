@@ -61,13 +61,4 @@ class General(commands.Cog):
         response = random.choice(encouragement)
         await ctx.send(response)
 
-    @commands.command(name="99")
-    async def command_99(self, ctx):
-        """
-        Makes me tell you a random Brooklynn 99 quote
-        """
-        response = requests.get(
-            "https://brooklyn-nine-nine-quotes.herokuapp.com/api/v1/quotes/random"
-        )
-        content = json.loads(response.content)
-        await ctx.send(content["Data"]["QuoteText"])
+    

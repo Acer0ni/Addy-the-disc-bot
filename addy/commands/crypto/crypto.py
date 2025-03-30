@@ -43,7 +43,6 @@ class Crypto(commands.Cog):
             user.favorites.append(coin_obj)
             session.add(user)
             session.commit()
-
             await ctx.send(await getters.response_formatter(user.favorites))
 
     @commands.command(name="favorites")

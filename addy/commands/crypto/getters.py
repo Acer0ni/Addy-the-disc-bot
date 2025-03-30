@@ -1,10 +1,4 @@
 import requests
-from addy.db import Session
-from addy.models import historicalwalletvalue
-from addy.models.crypto_wallet import Crypto_wallet
-from addy.models.crypto_holding import Crypto_holding
-from addy.models.historicalwalletvalue import HistoricalWalletValue
-from addy.models.user import User
 
 #pass in an id, and assert that the response is what i expect.
 async def get_coin_details(id):
@@ -38,63 +32,6 @@ async def response_formatter(favorites_list):
     for coin in response:
         response_string += f"Name: {coin['name']} Price: ${coin['current_price']:,.2f} Daily change: {coin['price_change_percentage_24h']}%{new_line}"
     return response_string
-
-
-# this is too big and complicated, figure out how to fix it.
-async def get_user(session, author):
-    try:
-        user = session.query(User).get(discord_id = author.id)
-    except TypeError:
-        print("type error or user not found.")
-        user = User(name=author.name,discord_id=author.id)
-        session.add(user)
-        session.commit()
-    finally:
-        if not user.crypto_wallet:
-            wallet = Crypto_wallet()
-            session.add(wallet)
-            user.crypto_wallet = wallet
-            session.flush()
-            holding_total = await tally_holdings(
-                session, user, user.crypto_wallet.crypto_holdings
-            )
-            print(wallet)
-            new_hwallet_value = HistoricalWalletValue(
-                crypto_wallet_id=user.crypto_wallet.id,
-                usd_balance=user.crypto_wallet.balance,
-                holdings_balance=holding_total["total"],
-                total_balance=holding_total["total"] + user.crypto_wallet.balance,
-            )
-            wallet.historicalvalue.append(new_hwallet_value)
-
-            session.commit()
-    return user
-
-
-async def tally_holdings(session, user_obj, user_holdings):
-
-    response = await bulk_http_get(user_holdings)
-    holdings_results = {
-        "total": 0,
-        "coins": {},
-    }
-    if not response:
-        print("no holdings in tally holdings")
-        return holdings_results
-    for holding in response:
-        current_holding = (
-            session.query(Crypto_holding)
-            .filter_by(crypto_wallet_id=user_obj.crypto_wallet.id)
-            .filter_by(coingecko_id=holding["id"])
-            .first()
-        )
-        holdings_results["coins"][current_holding.coingecko_id] = {
-            "amount": current_holding.amount,
-            "value": holding["current_price"],
-        }
-        holdings_results["total"] += holding["current_price"] * current_holding.amount
-    return holdings_results
-
 
 async def amount_calculator(amount, price):
     if amount[0] == "$":

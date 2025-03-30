@@ -1,0 +1,12 @@
+[project]
+name = "addy-the-disc-bot"
+version = "0.1.0"
+requires-python = ">=3.9.9"
+dependencies = [
+    "alembic==1.8.1",
+    "discord-py==2.0.1",
+    "psycopg2-binary==2.9.5",
+    "python-dotenv==0.21.0",
+    "requests==2.28.1",
+    "sqlalchemy==1.4.42",
+]
