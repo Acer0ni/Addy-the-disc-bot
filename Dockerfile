@@ -3,7 +3,10 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /app/
 COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --link-mode copy 
-COPY bot.py addy/ alembic/ alembic.ini data/ seed.py ./
+COPY bot.py  alembic.ini  seed.py ./
+COPY addy ./addy/
+COPY alembic ./alembic/
+COPY data ./data/
 CMD uv run bot.py
 
 
